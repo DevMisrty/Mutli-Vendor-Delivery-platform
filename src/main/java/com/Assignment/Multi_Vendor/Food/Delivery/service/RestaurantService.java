@@ -22,4 +22,6 @@ public interface RestaurantService {
     Restaurant removeDishFromMenu(Long restId, String dishName);
 
     Restaurant disApproveTheRestaurant(Long restId);
+
+    List<Dishes> getMenuByResturantName(String restsName);
 }

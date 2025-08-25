@@ -69,7 +69,16 @@ public class RestaurantServiceImplementation implements RestaurantService {
     @Override
     public Restaurant disApproveTheRestaurant(Long restId) {
         Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
-        restaurantRepository.deleteById(restId);
+        if(restaurant.getStatus()!= STATUS.NOT_APPROVED) {
+            return restaurant;
+        }
+        restaurant.setStatus(STATUS.NOT_APPROVED);
+        restaurantRepository.save(restaurant);
         return restaurant;
+    }
+
+    @Override
+    public List<Dishes> getMenuByResturantName(String restsName) {
+        return restaurantRepository.findByRestaurantName(restsName).getMenu();
     }
 }

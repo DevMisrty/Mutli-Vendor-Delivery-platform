@@ -29,11 +29,11 @@ public class Restaurant {
     @Column(nullable = false)
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "restaurant_menu", joinColumns = @JoinColumn(name = "restaurant_id"))
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
     private List<Dishes> menu;
 
-    private Integer reviews;
+    private Integer ratings;
 
     private ROLE role = ROLE.RESTAURANT_OWNER;
 
