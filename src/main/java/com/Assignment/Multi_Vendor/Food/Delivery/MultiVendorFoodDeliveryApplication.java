@@ -8,6 +8,6 @@ public class MultiVendorFoodDeliveryApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MultiVendorFoodDeliveryApplication.class, args);
-	}
+ 	}
 
 }
