@@ -19,9 +19,11 @@ public interface RestaurantService {
 
     List<Restaurant> getAllRestaurant();
 
-    Restaurant removeDishFromMenu(Long restId, String dishName);
+    Restaurant removeDishFromMenu(String restName, String dishName);
 
     Restaurant disApproveTheRestaurant(Long restId);
 
-    List<Dishes> getMenuByResturantName(String restsName);
+    List<Dishes> getMenuByRestaurantName(String restsName);
+
+    Restaurant addRatingToRest(String restName, Float ratings);
 }

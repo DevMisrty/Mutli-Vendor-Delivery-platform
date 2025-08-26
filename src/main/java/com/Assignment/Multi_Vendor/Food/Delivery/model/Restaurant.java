@@ -29,14 +29,29 @@ public class Restaurant {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "restaurant",orphanRemoval = true)
     private List<Dishes> menu;
 
-    private Integer ratings;
+    private Float ratings = 0f;
+    private Long count = 0L ;
 
+    @Enumerated(EnumType.STRING)
     private ROLE role = ROLE.RESTAURANT_OWNER;
 
+    @Enumerated(EnumType.STRING)
     private STATUS status = STATUS.NOT_APPROVED;
+
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+                "role=" + role +
+                ", status=" + status +
+                ", count=" + count +
+                ", ratings=" + ratings +
+                ", email='" + email + '\'' +
+                ", ownerName='" + ownerName + '\'' +
+                ", restaurantName='" + restaurantName + '\'' +
+                '}';
+    }
 }
 

@@ -18,5 +18,5 @@ public class RestaurantRequestDto {
     private String email;
     private String password;
     private List<Cuisine> menu;
-    private Integer review;
+    private Float review;
 }

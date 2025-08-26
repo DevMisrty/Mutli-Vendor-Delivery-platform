@@ -16,6 +16,6 @@ public class DishesResponseDto {
     private String description;
     private Cuisine cuisine;
     private Double price;
-    private Integer rating;
+    private Float rating;
 
 }

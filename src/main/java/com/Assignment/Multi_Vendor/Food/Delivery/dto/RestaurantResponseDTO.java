@@ -18,6 +18,6 @@ public class RestaurantResponseDTO {
     private String restaurantName;
     private String ownerName;
     private String email;
+    private Float ratings;
     private List<Dishes> menu;
-    private Integer reviews;
 }

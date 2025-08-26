@@ -10,4 +10,6 @@ public interface DishesService {
     List<DishesResponseDto> getMenuBasedOnCuisine(Cuisine selectedCuisine);
 
     List<DishesResponseDto> getMenuBasedOnStar(Integer star);
+
+    Dishes addRatingsToDish(String restName, String dishName, Float ratings);
 }

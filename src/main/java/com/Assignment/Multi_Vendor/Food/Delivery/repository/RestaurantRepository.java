@@ -6,10 +6,11 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RestaurantRepository extends ListCrudRepository<Restaurant,Long> {
     List<Restaurant> findAllByStatus(STATUS status);
 
-    Restaurant findByRestaurantName(String name);
+    Optional<Restaurant> findByRestaurantName(String name);
 }

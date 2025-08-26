@@ -74,9 +74,11 @@ public class RestaurantController {
     }
 
     // Deletes the Dish from the Menu.
-    @DeleteMapping("/deleteDish/{restId}/{dishName}")
-    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> deleteDishFromMenu(@PathVariable Long restId, @PathVariable String dishName){
-        Restaurant restaurant = restaurantService.removeDishFromMenu(restId, dishName);
+    @DeleteMapping("/deleteDish/{restName}/{dishName}")
+    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> deleteDishFromMenu(
+            @PathVariable String restName,
+            @PathVariable String dishName){
+        Restaurant restaurant = restaurantService.removeDishFromMenu(restName, dishName);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body( new ApiResponse<>(

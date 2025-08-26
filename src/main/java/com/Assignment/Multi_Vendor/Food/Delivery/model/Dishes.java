@@ -1,6 +1,7 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,12 +25,27 @@ public class Dishes {
     @Enumerated(EnumType.STRING)
     private Cuisine cuisine;
 
-    private double price;
+    private Double price;
 
-    private Integer rating;
+    private Float rating = 0f;
+
+    private Long count = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
-    @JsonBackReference  // Prevent infinite recursion
+    @JsonIgnore  // Prevent infinite recursion
     private Restaurant restaurant;
+
+
+    @Override
+    public String toString() {
+        return "Dishes{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", cuisine=" + cuisine +
+                ", price=" + price +
+                ", rating=" + rating +
+                ", count=" + count +
+                '}';
+    }
 }

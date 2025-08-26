@@ -3,6 +3,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.service.implementation;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.STATUS;
+import com.Assignment.Multi_Vendor.Food.Delivery.repository.DishesRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.RestaurantRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class RestaurantServiceImplementation implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
+    private final DishesRepository dishesRepository;
 
     @Override
     public List<Restaurant> getAllNotApprovedRestaurant() {
@@ -39,6 +42,9 @@ public class RestaurantServiceImplementation implements RestaurantService {
     @Override
     public Restaurant addNewMenu(List<Dishes> menu, Long restId) {
         Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+        for (Dishes dish : menu) {
+            dish.setRestaurant(restaurant);
+        }
         restaurant.setMenu(menu);
         return restaurantRepository.save(restaurant);
     }
@@ -46,6 +52,9 @@ public class RestaurantServiceImplementation implements RestaurantService {
     @Override
     public Restaurant addDishesToMenu(List<Dishes> dishes, Long restId) {
         Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+        for (Dishes dish : dishes) {
+            dish.setRestaurant(restaurant);
+        }
         restaurant.getMenu().addAll(dishes);
         return restaurantRepository.save(restaurant);
     }
@@ -56,20 +65,18 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant removeDishFromMenu(Long restId, String dishName) {
-        Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
-        List<Dishes> dishes = restaurant.getMenu()
-                .stream()
-                .filter(dish -> !dish.getName().equals(dishName))
-                .collect(Collectors.toList());
-        restaurant.setMenu(dishes);
+    public Restaurant removeDishFromMenu(String restName, String dishName) {
+        Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName, restName).orElseThrow();
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
+        restaurant.getMenu().remove(dish);
+        dishesRepository.deleteById(dish.getId());
         return restaurantRepository.save(restaurant);
     }
 
     @Override
     public Restaurant disApproveTheRestaurant(Long restId) {
         Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
-        if(restaurant.getStatus()!= STATUS.NOT_APPROVED) {
+        if(restaurant.getStatus()== STATUS.NOT_APPROVED) {
             return restaurant;
         }
         restaurant.setStatus(STATUS.NOT_APPROVED);
@@ -78,7 +85,19 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public List<Dishes> getMenuByResturantName(String restsName) {
-        return restaurantRepository.findByRestaurantName(restsName).getMenu();
+    public List<Dishes> getMenuByRestaurantName(String restsName) {
+        return restaurantRepository.findByRestaurantName(restsName).orElseThrow().getMenu();
     }
+
+    @Override
+    public Restaurant addRatingToRest(String restName, Float ratings) {
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
+        Float newRating =
+                ((((restaurant.getRatings() * restaurant.getCount()) + ratings) / (restaurant.getCount() + 1)));
+        restaurant.setRatings(newRating);
+        restaurant.setCount(restaurant.getCount()+1);
+        return restaurantRepository.save(restaurant);
+    }
+
+
 }
