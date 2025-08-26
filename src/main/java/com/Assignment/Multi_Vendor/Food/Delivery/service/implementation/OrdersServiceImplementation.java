@@ -12,9 +12,11 @@ import com.Assignment.Multi_Vendor.Food.Delivery.service.OrdersService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -86,5 +88,10 @@ public class OrdersServiceImplementation implements OrdersService {
         Orders savedOrder = ordersRepository.save(order);
         return converter.convertOrderToOrderResponseDto(savedOrder);
 
+    }
+
+    @Override
+    public List<Orders> getAllOutForDeliveryOrders(Integer limit) {
+        return ordersRepository.findAllByStatus(OrderStatus.OUT_FOR_DELIVERY, Limit.of(limit));
     }
 }

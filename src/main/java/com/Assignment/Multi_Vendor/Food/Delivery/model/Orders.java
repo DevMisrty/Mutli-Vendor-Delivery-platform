@@ -36,4 +36,7 @@ public class Orders {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cutomer_id")
     private Customers customers;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    private DeliveryAgent agent;
 }

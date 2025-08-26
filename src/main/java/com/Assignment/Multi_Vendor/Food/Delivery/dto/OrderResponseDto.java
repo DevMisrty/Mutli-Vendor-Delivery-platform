@@ -24,6 +24,9 @@ public class OrderResponseDto {
     private LocalDateTime orderedAt;
     private OrderStatus status;
 
+    private String deliveryAgentName;
+    private Long deliveryAgentId;
+
     private String customerName;
     private String customerEmail;
 }
