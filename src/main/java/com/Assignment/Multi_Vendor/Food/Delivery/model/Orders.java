@@ -27,16 +27,18 @@ public class Orders {
     @Column(nullable = false)
     private Double price;
 
+    @Enumerated(EnumType.STRING)
     private PaymentMode mode = PaymentMode.CASH_ON_DELIVERY;
 
     private LocalDateTime orderedAt = LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PLACED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cutomer_id")
     private Customers customers;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private DeliveryAgent agent;
 }

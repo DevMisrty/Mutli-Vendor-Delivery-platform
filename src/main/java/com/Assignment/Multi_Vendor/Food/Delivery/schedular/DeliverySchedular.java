@@ -1,6 +1,7 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.schedular;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.model.DeliveryAgent;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.OrderStatus;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Orders;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.DeliveryAgentRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.OrdersRepository;
@@ -27,33 +28,62 @@ public class DeliverySchedular {
     private final DeliveryAgentRepository deliveryAgentRepository;
 
 
-    @Scheduled( cron = "0 */5 * * * *")
+    @Scheduled( cron = "0 * * * * *")
     public void checkForDeliveryAgentAndAssignOrders(){
-        log.info("Schedular started");
+        log.info("checkForDeliveryAgentAndAssignOrders, Schedular started");
         List<DeliveryAgent> agents = deliveryAgentService.getAllDeliveryAgents()
                 .stream()
                 .filter(agent ->
                         agent.getAvaibilty().before(new Date(System.currentTimeMillis())))
                 .collect(Collectors.toList());
 
-        List<Orders> outForDeliveryOrders = ordersService.getAllOutForDeliveryOrders(agents.size());
 
-        if(agents.isEmpty() || outForDeliveryOrders.isEmpty() ){
-            log.info("No Delivery Agent is Available, Or no Order to deliver");
+
+        if(agents.isEmpty() ){
+            log.info("No Delivery Agent is Available ");
             return;
         }
 
+        List<Orders> outForDeliveryOrders = ordersService.getAllOutForDeliveryOrders(agents.size());
+
+        if(outForDeliveryOrders.isEmpty()){
+            log.info("No Order to deliver");
+        }
         int i=0;
 
         for(Orders order : outForDeliveryOrders){
+
+            if(order.getAgent()!=null){
+                continue;
+            }
             DeliveryAgent agent = agents.get(i);
             i++;
 
+            agent.setAvaibilty(new Date(agent.getAvaibilty().getTime() + 1000 * 60 * 2 ));
             order.setAgent(agent);
             agent.setOrders(order);
 
             ordersRepository.save(order);
             deliveryAgentRepository.save(agent);
+
+            log.info("{}, order has been assigned to {} delivery agent. " , order.getOrderId(),agent.getFirstName());
+        }
+    }
+
+    @Scheduled( cron = "0 * * * * *")
+    public void changeTheOrdersStatus(){
+        log.info("changeTheOrdersStatus, schedular started");
+        List<Orders> orders = ordersRepository.findAllByStatus(OrderStatus.OUT_FOR_DELIVERY)
+                .stream()
+                .filter(order -> order
+                        .getAgent().getAvaibilty().before(new Date()))
+                .collect(Collectors.toList());
+        for (Orders order : orders){
+            order.setStatus(OrderStatus.DELIVERED);
+            order.setAgent(null);
+            ordersRepository.save(order);
+
+            log.info(order.getOrderId() + " " + order.getDishName()+" has been delivered. ");
         }
     }
 

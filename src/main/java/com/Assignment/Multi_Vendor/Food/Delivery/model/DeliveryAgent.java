@@ -29,7 +29,7 @@ public class DeliveryAgent {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @OneToOne(mappedBy = "agent")
+    @OneToOne(mappedBy = "agent", fetch = FetchType.EAGER)
     @JsonIgnore
     private Orders orders;
 }

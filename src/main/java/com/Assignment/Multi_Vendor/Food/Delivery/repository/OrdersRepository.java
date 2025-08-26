@@ -13,5 +13,6 @@ public interface OrdersRepository extends ListCrudRepository<Orders,Long> {
 
     List<Orders> findAllByStatus(OrderStatus status, Limit limit);
 
-    OrderStatus Status(OrderStatus status);
+    List<Orders> findAllByStatus(OrderStatus status);
+
 }
