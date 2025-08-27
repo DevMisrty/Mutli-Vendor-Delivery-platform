@@ -26,4 +26,6 @@ public interface RestaurantService {
     List<Dishes> getMenuByRestaurantName(String restsName);
 
     Restaurant addRatingToRest(String restName, Float ratings);
+
+    Restaurant getRestaurantByEmail(String email);
 }

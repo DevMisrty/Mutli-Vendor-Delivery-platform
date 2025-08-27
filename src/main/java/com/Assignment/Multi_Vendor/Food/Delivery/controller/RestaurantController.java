@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/resta")
+@RequestMapping("/rest")
 @RequiredArgsConstructor
 public class RestaurantController {
 
@@ -27,7 +27,7 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     // Adds the new restaurant to Be approved by admin
-    @PostMapping("/addRestaurant")
+//    @PostMapping("/addRestaurant")
     public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto){
         Restaurant restaurant = modelMapper.map(restaurantRequestDto, Restaurant.class);
         log.info("restaurant : {}",restaurant);

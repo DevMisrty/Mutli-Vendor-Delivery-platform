@@ -32,4 +32,14 @@ public class DeliveryAgent {
     @OneToOne(mappedBy = "agent", fetch = FetchType.EAGER)
     @JsonIgnore
     private Orders orders;
+
+    @Override
+    public String toString() {
+        return "DeliveryAgent{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", avaibilty=" + avaibilty +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }

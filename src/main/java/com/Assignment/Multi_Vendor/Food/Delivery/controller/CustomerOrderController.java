@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/resta/order")
+@RequestMapping("/rest/order")
 public class CustomerOrderController {
 
     private final OrdersService ordersService;
     private final DeliveryAgentService deliveryAgentService;
 
+    // changes the status of the order
     @GetMapping("/{orderId}/{status}")
     public ResponseEntity<ApiResponse<OrderResponseDto>> changeOrderStatus(@PathVariable Long orderId, @PathVariable String status ){
         OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());

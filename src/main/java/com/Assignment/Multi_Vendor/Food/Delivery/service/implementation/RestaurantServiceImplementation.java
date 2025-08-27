@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,11 +42,22 @@ public class RestaurantServiceImplementation implements RestaurantService {
 
     @Override
     public Restaurant addNewMenu(List<Dishes> menu, Long restId) {
-        Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+        Restaurant restaurant = restaurantRepository.findById(restId)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        List<Dishes> existingMenu = restaurant.getMenu();
+        if (existingMenu == null) {
+            existingMenu = new ArrayList<>();
+            restaurant.setMenu(existingMenu);
+        }
+
+        existingMenu.clear();
+
         for (Dishes dish : menu) {
             dish.setRestaurant(restaurant);
+            existingMenu.add(dish);
         }
-        restaurant.setMenu(menu);
+
         return restaurantRepository.save(restaurant);
     }
 
@@ -97,6 +109,11 @@ public class RestaurantServiceImplementation implements RestaurantService {
         restaurant.setRatings(newRating);
         restaurant.setCount(restaurant.getCount()+1);
         return restaurantRepository.save(restaurant);
+    }
+
+    @Override
+    public Restaurant getRestaurantByEmail(String email) {
+        return restaurantRepository.findByEmail(email).orElseThrow();
     }
 
 

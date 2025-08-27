@@ -41,4 +41,17 @@ public class Orders {
 
     @OneToOne(fetch = FetchType.EAGER)
     private DeliveryAgent agent;
+
+    @Override
+    public String toString() {
+        return "Orders{" +
+                "dishName='" + dishName + '\'' +
+                ", restaurantName='" + restaurantName + '\'' +
+                ", price=" + price +
+                ", mode=" + mode +
+                ", orderedAt=" + orderedAt +
+                ", status=" + status +
+                ", customers=" + customers +
+                '}';
+    }
 }

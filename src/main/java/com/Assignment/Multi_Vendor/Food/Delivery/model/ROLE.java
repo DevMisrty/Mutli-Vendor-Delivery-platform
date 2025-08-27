@@ -1,6 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.model;
 
-enum ROLE {
+public enum ROLE {
 
     ADMIN,
     RESTAURANT_OWNER,

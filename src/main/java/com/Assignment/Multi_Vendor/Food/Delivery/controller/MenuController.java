@@ -26,7 +26,7 @@ public class MenuController {
     private final DishesService dishesService;
     private final ModelMapper modelMapper;
 
-    @GetMapping("/resta/{restsName}")
+    @GetMapping("/rest/{restsName}")
     public ResponseEntity<ApiResponse<List<Dishes>>> getMenuOfRestaurant(@PathVariable String restsName){
         List<Dishes> menu = restaurantService.getMenuByRestaurantName(restsName);
 
