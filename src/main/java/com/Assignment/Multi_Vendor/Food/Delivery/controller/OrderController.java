@@ -1,8 +1,12 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
+import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.OrdersService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,17 +22,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrdersService ordersService;
+    private final JwtUtility jwtUtility;
+    private final CustomerRepository customerRepository;
 
 
     // Places the order with restId, and DishId,
-    // pending task - after applying security, fetch the customer id form the Jwt token, load it from
+    // pending completed - after applying security, fetch the customer id form the Jwt token, load it from
     //      customer repository, and add it to Order Entity, Currently, hard placed the value.
     @GetMapping("/placeOrder/{restName}/{dishName}")
     @Transactional
     public ResponseEntity<ApiResponse<OrderResponseDto>> placeOrder(
-            @PathVariable String restName, @PathVariable String dishName){
+            @PathVariable String restName, 
+            @PathVariable String dishName,
+            HttpServletRequest request
+            ){
 
-        OrderResponseDto orderPlaced = ordersService.placeOrder(restName, dishName);
+        String token = request.getHeader("Authorization").substring(7);
+        String emailFromToken = jwtUtility.getEmailFromToken(token);
+
+        Customers customer = customerRepository.findByEmail(emailFromToken).orElseThrow();
+
+        OrderResponseDto orderPlaced = ordersService.placeOrder(restName, dishName,customer);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -40,8 +54,14 @@ public class OrderController {
     }
 
     @GetMapping("/view/{orderId}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails(@PathVariable Long orderId){
-        OrderResponseDto order = ordersService.viewOrderDetails(orderId);
+    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails(@PathVariable Long orderId, HttpServletRequest request){
+
+        String token = request.getHeader("Authorization").substring(7);
+        String emailFromToken = jwtUtility.getEmailFromToken(token);
+
+        Customers customer = customerRepository.findByEmail(emailFromToken).orElseThrow();
+
+        OrderResponseDto order = ordersService.viewOrderDetails(orderId, customer.getId());
 
         return ResponseEntity
                 .status(HttpStatus.OK)

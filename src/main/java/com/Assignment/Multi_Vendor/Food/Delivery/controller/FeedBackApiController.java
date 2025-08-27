@@ -8,6 +8,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DishesService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
@@ -28,9 +29,7 @@ public class FeedBackApiController {
     private final ModelMapper modelMapper;
     private final PojoToDtoConverter converter;
 
-    // adds the review to the dish,
-    // pending -> after implementing spring security, make sure to verify that
-    // the User has ordered the dish, using orders table
+    // adds the review to the dish
     @GetMapping("/dish/{restName}/{dishName}/{ratings}")
     public ResponseEntity<ApiResponse<DishesResponseDto>> giveFeedbackToDish(
             @PathVariable String restName,
@@ -54,7 +53,6 @@ public class FeedBackApiController {
 
 
     // adds review to the restaurants
-    // pending -> after spring security, verify that customer has ordered something from the restaurant table.
     @GetMapping("/rest/{restName}/{ratings}")
     public ResponseEntity<ApiResponse<?>> addRatingsToRest(
             @PathVariable String restName,

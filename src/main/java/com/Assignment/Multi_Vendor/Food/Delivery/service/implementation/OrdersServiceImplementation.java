@@ -34,9 +34,7 @@ public class OrdersServiceImplementation implements OrdersService {
     // pending - currently hardcoded the customer Id, but after implementing spring Security, get the
     //           customer Id from the JWT token and fetch it from the database.
     @Override
-    public OrderResponseDto placeOrder(String restName, String dishName) {
-
-        Customers customers = customerRepository.findById(1L).orElseThrow();
+    public OrderResponseDto placeOrder(String restName, String dishName, Customers customers) {
 
         Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName,restName).orElseThrow();
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
@@ -69,8 +67,9 @@ public class OrdersServiceImplementation implements OrdersService {
     //          the customer id from jwt token is matching with Order ENTITY fetched, if matched
     //             return OrderResponseDto, else return null.
     @Override
-    public OrderResponseDto viewOrderDetails(Long orderId) {
+    public OrderResponseDto viewOrderDetails(Long orderId, Long customerId) {
         Orders order = ordersRepository.findById(orderId).orElseThrow();
+        if(order.getCustomers().getId()!= customerId) return new OrderResponseDto();
         return converter.convertOrderToOrderResponseDto(order);
     }
 
@@ -79,8 +78,13 @@ public class OrdersServiceImplementation implements OrdersService {
     // pending -> after implementing spring security, verify that the restId from Jwt token matches
     //              with the one present inside the order entity.
     @Override
-    public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus orderStatus) {
+    public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus orderStatus, String restName) {
         Orders order = ordersRepository.findById(orderId).orElseThrow();
+
+        if(!order.getRestaurantName().equals(restName)){
+            return new OrderResponseDto();
+        }
+
         if(order.getStatus()==OrderStatus.DELIVERED){
             return converter.convertOrderToOrderResponseDto(order);
         }
