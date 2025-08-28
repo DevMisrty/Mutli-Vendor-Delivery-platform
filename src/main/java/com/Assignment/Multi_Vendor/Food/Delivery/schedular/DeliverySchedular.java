@@ -56,12 +56,11 @@ public class DeliverySchedular {
 
         for(Orders order : outForDeliveryOrders){
 
-            log.info("before checking agentid");
             if(order.getAgent()!=null){
-                log.info(" agentid is not null");
+                log.info(" agent " + order.getAgent().getFirstName() +
+                        order.getAgent().getLastName() + " is assigned to order " + order.getOrderId());
                 continue;
             }
-            log.info("after checking agentid");
             DeliveryAgent agent = agents.get(i);
             i++;
 
