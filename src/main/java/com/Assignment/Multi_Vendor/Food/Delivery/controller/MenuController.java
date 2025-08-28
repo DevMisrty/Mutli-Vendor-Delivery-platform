@@ -4,6 +4,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.DishesResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Cuisine;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.STATUS;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DishesService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +29,18 @@ public class MenuController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/rest/{restsName}")
-    public ResponseEntity<ApiResponse<List<Dishes>>> getMenuOfRestaurant(@PathVariable String restsName){
+    public ResponseEntity<ApiResponse<?>> getMenuOfRestaurant(@PathVariable String restsName){
         List<Dishes> menu = restaurantService.getMenuByRestaurantName(restsName);
-
+        Restaurant restaurant = restaurantService.getRestaurantByName(restsName).orElseThrow();
+        if(restaurant.getStatus()== STATUS.NOT_APPROVED){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Error Fetching details of restaurant, " + restsName,
+                            "Restaurant is not yet approved ."
+                    ));
+        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(new ApiResponse<>(

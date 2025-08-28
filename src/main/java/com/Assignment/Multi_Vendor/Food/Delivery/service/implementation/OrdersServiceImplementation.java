@@ -31,7 +31,7 @@ public class OrdersServiceImplementation implements OrdersService {
 
 
     // Creates the order Entity from the dishName, and the Restaurant Id,
-    // pending - currently hardcoded the customer Id, but after implementing spring Security, get the
+    // completed - currently hardcoded the customer Id, but after implementing spring Security, get the
     //           customer Id from the JWT token and fetch it from the database.
     @Override
     public OrderResponseDto placeOrder(String restName, String dishName, Customers customers) {
@@ -63,9 +63,10 @@ public class OrdersServiceImplementation implements OrdersService {
 
 
     // fetches the order details, based on Order id.
-    // pending, after implementing spring security, before returning the OrderResponseDto, verify that
+    // completed, after implementing spring security, before returning the OrderResponseDto, verify that
     //          the customer id from jwt token is matching with Order ENTITY fetched, if matched
-    //             return OrderResponseDto, else return null.
+    //
+    //            return OrderResponseDto, else return null.
     @Override
     public OrderResponseDto viewOrderDetails(Long orderId, Long customerId) {
         Orders order = ordersRepository.findById(orderId).orElseThrow();
@@ -75,7 +76,7 @@ public class OrdersServiceImplementation implements OrdersService {
 
 
     // changes the status of the order,
-    // pending -> after implementing spring security, verify that the restId from Jwt token matches
+    // completed -> after implementing spring security, verify that the restId from Jwt token matches
     //              with the one present inside the order entity.
     @Override
     public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus orderStatus, String restName) {

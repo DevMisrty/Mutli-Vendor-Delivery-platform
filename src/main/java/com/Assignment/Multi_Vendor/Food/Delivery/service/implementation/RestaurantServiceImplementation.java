@@ -116,5 +116,10 @@ public class RestaurantServiceImplementation implements RestaurantService {
         return restaurantRepository.findByEmail(email).orElseThrow();
     }
 
+    @Override
+    public Optional<Restaurant> getRestaurantByName(String restsName) {
+       return restaurantRepository.findByRestaurantName(restsName);
+    }
+
 
 }

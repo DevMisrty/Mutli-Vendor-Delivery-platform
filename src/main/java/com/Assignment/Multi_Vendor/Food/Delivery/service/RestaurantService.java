@@ -4,6 +4,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RestaurantService {
 
@@ -28,4 +29,6 @@ public interface RestaurantService {
     Restaurant addRatingToRest(String restName, Float ratings);
 
     Restaurant getRestaurantByEmail(String email);
+
+    Optional<Restaurant> getRestaurantByName(String restsName);
 }

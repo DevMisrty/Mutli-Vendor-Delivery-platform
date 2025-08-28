@@ -4,6 +4,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.converter.PojoToDtoConverter;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.DishesResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Cuisine;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.STATUS;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.DishesRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DishesService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class DishesServiceImplementation implements DishesService {
         List<Dishes> dishes = dishesRepository.findByCuisine(selectedCuisine);
         return dishes.stream()
                 .filter(dish -> dish.getRestaurant()!=null)
+                .filter(dish -> dish.getRestaurant().getStatus()!= STATUS.NOT_APPROVED)
                 .map(converter::convertDishToDishResponseDto )
                 .collect(Collectors.toList());
     }
@@ -37,6 +39,7 @@ public class DishesServiceImplementation implements DishesService {
 
         return dishes.stream()
                 .filter(dish -> dish.getRestaurant()!=null)
+                .filter(dish -> dish.getRestaurant().getStatus()!= STATUS.NOT_APPROVED)
                 .map(converter::convertDishToDishResponseDto)
                 .collect(Collectors.toList());
     }
