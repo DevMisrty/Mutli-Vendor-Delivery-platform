@@ -1,13 +1,11 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
-import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
-import com.Assignment.Multi_Vendor.Food.Delivery.dto.CustomerDto;
-import com.Assignment.Multi_Vendor.Food.Delivery.dto.LoginRequestDto;
-import com.Assignment.Multi_Vendor.Food.Delivery.dto.Users;
+import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.CustomerService;
+import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +32,9 @@ public class CustomerAuthController {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
-    private EntityManagerFactoryInfo entityManagerFactoryInfo;
-    @Autowired
     private JwtUtility jwtUtility;
+    @Autowired
+    private OTPAuthService oTPAuthService;
 
     @PostMapping("/signin")
     public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto){
@@ -61,7 +59,33 @@ public class CustomerAuthController {
                 )
         );
 
-        Customers customer = customerRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow();
+        EmailDetailsDto emailDetails = EmailDetailsDto.builder()
+                .to(loginRequestDto.getEmail())
+                .build();
+
+        oTPAuthService.sendMail(emailDetails);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>(
+                        HttpStatus.OK.value(),
+                        "your credentials has been verified, and mail has been send to your email for verification",
+                        "redirect to localhost:8080/auth/customer/otpverification , for verifing the otp"
+                ));
+    }
+
+    @PostMapping("/otpverification")
+    public ResponseEntity<ApiResponse<?>> otpVerification(@RequestBody OtpRequestDto requestDto){
+
+        if(requestDto.getOtp() != 123456){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Provided otp is incorrect, pls login again"
+                    ));
+        }
+
+        Customers customer = customerRepository.findByEmail(requestDto.getEmail()).orElseThrow();
 
         Users users = Users.builder()
                 .email(customer.getEmail())

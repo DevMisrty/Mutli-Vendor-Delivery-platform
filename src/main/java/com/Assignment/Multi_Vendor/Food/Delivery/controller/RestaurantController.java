@@ -60,7 +60,10 @@ public class RestaurantController {
 
     // Adds the new Dish in the existing menu.
     @PostMapping("/addDishes/{restId}")
-    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewDishesInMenu(@RequestBody List<Dishes> dishes, @PathVariable Long restId){
+    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewDishesInMenu(
+            @RequestBody List<Dishes> dishes,
+            @PathVariable Long restId){
+        log.info("jkguyagewuhyvcyuev");
         Restaurant restaurant = restaurantService.addDishesToMenu(dishes, restId);
         RestaurantResponseDTO responseDto = modelMapper.map(restaurant, RestaurantResponseDTO.class);
         log.info("Restaurant : {}", responseDto);

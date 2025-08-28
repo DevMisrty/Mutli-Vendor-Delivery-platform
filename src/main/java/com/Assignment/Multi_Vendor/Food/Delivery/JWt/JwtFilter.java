@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String role;
 
         String authToken = request.getHeader("Authorization");
-        if(authToken==null || !authToken.startsWith("Bearer")){
+        if(authToken==null || !authToken.startsWith("Bearer ")){
             filterChain.doFilter(request,response);
             return;
         }

@@ -6,6 +6,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.RestaurantRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
@@ -15,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +29,7 @@ public class RestaurantOwnerAuthController {
     private final AuthenticationManager ownerAuthenticateManager;
     private final RestaurantService restaurantService;
     private final JwtUtility jwtUtility;
+    private final OTPAuthService oTPAuthService;
 
     @PostMapping("/rest/signin")
     public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto){
@@ -58,7 +57,38 @@ public class RestaurantOwnerAuthController {
                 )
         );
 
+        EmailDetailsDto emailDetails = EmailDetailsDto.builder()
+                .to(requestDto.getEmail())
+                .build();
+
+        oTPAuthService.sendMail(emailDetails);
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(
+                        new ApiResponse<>(
+                                HttpStatus.ACCEPTED.value(),
+                                "OTP has been sent to ur mail",
+                                "Pls redirect to /auth/rest/otpVerification url to submit the otp, submit it using query parameter"
+                        ));
+    }
+
+
+    @PostMapping("/rest/otpverification")
+    public ResponseEntity<ApiResponse<?>> getOtpVerify(@RequestBody OtpRequestDto requestDto)
+    {
+        if(requestDto.getOtp()!=123456){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Provided otp is incorrect, pls login again"
+                            ));
+        }
+
         Restaurant rest = restaurantService.getRestaurantByEmail(requestDto.getEmail());
+
+
 
         Users users = Users.builder()
                 .email(rest.getEmail())

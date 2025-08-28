@@ -35,7 +35,7 @@ public class AdminAuthController {
     private final JwtUtility jwtUtility;
 
     // for creating the admin entity inside the database, to get proper salt value for the BCrypt encoder.
-//    @PostMapping("/signin")
+    @PostMapping("/signin")
     public ResponseEntity<ApiResponse<?>> addNewAdmin(@RequestBody LoginRequestDto requestDto){
         Admin admin = modelMapper.map(requestDto, Admin.class);
         admin.setRole(ROLE.ADMIN);
