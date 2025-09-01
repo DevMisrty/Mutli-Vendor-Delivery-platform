@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.converter.PojoToDtoConverter;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.DishesResponseDto;
@@ -35,7 +36,7 @@ public class FeedBackApiController {
             @PathVariable String restName,
             @PathVariable String dishName,
             @PathVariable Float ratings
-    ){
+    ) throws RuntimeException{
         if(ratings>5)ratings = 5f;
         Dishes dish = dishesService.addRatingsToDish(restName, dishName, ratings);
 
@@ -57,7 +58,7 @@ public class FeedBackApiController {
     public ResponseEntity<ApiResponse<?>> addRatingsToRest(
             @PathVariable String restName,
             @PathVariable Float ratings
-    ){
+    ) throws RestaurantNotFoundException {
         if(ratings >5) ratings = 5f;
         Restaurant restaurant = restaurantService.addRatingToRest(restName, ratings);
 

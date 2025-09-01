@@ -1,5 +1,8 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.NoSuchOrderException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantAccessDeniedException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
@@ -21,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/rest/order")
-public class CustomerOrderController {
+public class RestaurantOrderController {
 
     private final OrdersService ordersService;
     private final DeliveryAgentService deliveryAgentService;
@@ -35,15 +38,16 @@ public class CustomerOrderController {
             @PathVariable Long orderId,
             @PathVariable String status,
             HttpServletRequest request
-            ){
+            ) throws RestaurantNotFoundException, NoSuchOrderException, RestaurantAccessDeniedException {
 
         String token = request.getHeader("Authorization").substring(7);
         String email = jwtUtility.getEmailFromToken(token);
 
-        Restaurant restaurant = restaurantRepository.findByEmail(email).orElseThrow();
+        Restaurant restaurant = restaurantService.checkIfRestaurantExists(email);
 
         OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
-        OrderResponseDto orderResponse = ordersService.changeOrderStatus(orderId, orderStatus, restaurant.getRestaurantName());
+        OrderResponseDto orderResponse =
+                ordersService.changeOrderStatus(orderId, orderStatus, restaurant.getRestaurantName());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body( new ApiResponse<>(

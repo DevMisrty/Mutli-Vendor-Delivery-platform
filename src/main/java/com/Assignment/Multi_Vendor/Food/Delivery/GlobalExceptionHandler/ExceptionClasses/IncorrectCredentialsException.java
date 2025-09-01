@@ -2,7 +2,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.Excepti
 
 public class IncorrectCredentialsException extends Exception{
 
-    public IncorrectCredentialsException() {
+    public IncorrectCredentialsException(String s) {
         super("");
     }
 }

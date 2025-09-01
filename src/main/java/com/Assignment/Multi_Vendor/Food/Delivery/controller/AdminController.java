@@ -43,7 +43,8 @@ public class AdminController {
 
     // approves the restaurants, by changing the status, NOT_APPROVED -> APPROVED.
     @GetMapping("/approved/{restId}")
-    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> approveTheRestaurant(@PathVariable Long restId) throws RestaurantNotFoundException {
+    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> approveTheRestaurant(@PathVariable Long restId)
+            throws RestaurantNotFoundException {
 
         Restaurant restaurant = restaurantService.approvedRestaurant(restId);
         AdminRestaurantResponseDto response = modelMapper.map(restaurant, AdminRestaurantResponseDto.class);
@@ -58,7 +59,8 @@ public class AdminController {
     }
 
     @GetMapping("/disapproved/{restId}")
-    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> disapproveTheRestaurant(@PathVariable Long restId){
+    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> disapproveTheRestaurant(@PathVariable Long restId)
+            throws RestaurantNotFoundException {
 
         Restaurant restaurant = restaurantService.disApproveTheRestaurant(restId);
         return ResponseEntity

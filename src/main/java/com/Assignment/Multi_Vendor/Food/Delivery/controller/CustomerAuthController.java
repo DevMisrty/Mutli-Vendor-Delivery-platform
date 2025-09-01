@@ -1,7 +1,9 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectCredentialsException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.UserNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
+import com.Assignment.Multi_Vendor.Food.Delivery.configuration.FoodDeliveryPlatform;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
@@ -14,8 +16,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.jpa.EntityManagerFactoryInfo;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,18 +29,16 @@ public class CustomerAuthController {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final CustomerService customerService;
-
-    @Autowired
-    private AuthenticationManager customerAuthenticationManager;
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private JwtUtility jwtUtility;
-    @Autowired
-    private OTPAuthService oTPAuthService;
+    private final AuthenticationManager customerAuthenticationManager;
+    private final CustomerRepository customerRepository;
+    private final JwtUtility jwtUtility;
+    private final OTPAuthService oTPAuthService;
+    private Integer otp;
+    private String email;
 
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto) throws UserNameAlreadyTakenException {
+    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto)
+            throws UserNameAlreadyTakenException {
         Customers customer = modelMapper.map(customerDto, Customers.class);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         Customers customers = customerService.addNewCustomer(customer);
@@ -52,38 +52,54 @@ public class CustomerAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> loginCustomer(@RequestBody LoginRequestDto loginRequestDto){
-        customerAuthenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequestDto.getEmail(),
-                        loginRequestDto.getPassword()
-                )
-        );
+    public ResponseEntity<?> loginCustomer(@RequestBody LoginRequestDto loginRequestDto){
 
-        EmailDetailsDto emailDetails = EmailDetailsDto.builder()
-                .to(loginRequestDto.getEmail())
-                .build();
+        try {
+            customerAuthenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequestDto.getEmail(),
+                            loginRequestDto.getPassword()
+                    )
+            );
 
-        oTPAuthService.sendMail(emailDetails);
+            EmailDetailsDto emailDetails = EmailDetailsDto.builder()
+                    .to(loginRequestDto.getEmail())
+                    .build();
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "your credentials has been verified, and mail has been send to your email for verification",
-                        "redirect to localhost:8080/auth/customer/otpverification , for verifing the otp"
-                ));
+            email= loginRequestDto.getEmail();
+            otp = FoodDeliveryPlatform.generateOtp();
+
+            oTPAuthService.sendMail(emailDetails, otp);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse<>(
+                            HttpStatus.OK.value(),
+                            "your credentials has been verified, and mail has been send to your email for verification",
+                            "redirect to localhost:8080/auth/customer/otpverification , for verifing the otp"
+                    ));
+        }
+        catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid email or password");
+        } catch (UsernameNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        } catch (DisabledException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Account is disabled");
+        } catch (LockedException ex) {
+            return ResponseEntity.status(HttpStatus.LOCKED)
+                    .body("Account is locked");
+        }
     }
 
     @PostMapping("/otpverification")
-    public ResponseEntity<ApiResponse<?>> otpVerification(@RequestBody OtpRequestDto requestDto){
+    public ResponseEntity<ApiResponse<?>> otpVerification(@RequestBody OtpRequestDto requestDto)
+            throws IncorrectCredentialsException {
 
-        if(requestDto.getOtp() != 123456){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(
-                            HttpStatus.BAD_REQUEST.value(),
-                            "Provided otp is incorrect, pls login again"
-                    ));
+        if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
+
+            throw new IncorrectCredentialsException("Incorrect OTP, Pls enter correct otp.");
         }
 
         Customers customer = customerRepository.findByEmail(requestDto.getEmail()).orElseThrow();

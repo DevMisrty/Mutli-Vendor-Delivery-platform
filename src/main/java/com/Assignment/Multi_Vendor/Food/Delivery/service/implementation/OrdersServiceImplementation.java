@@ -1,5 +1,9 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.service.implementation;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerAccessDeniedException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.NoSuchOrderException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantAccessDeniedException;
 import com.Assignment.Multi_Vendor.Food.Delivery.converter.PojoToDtoConverter;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantResponseDTO;
@@ -31,12 +35,13 @@ public class OrdersServiceImplementation implements OrdersService {
 
 
     // Creates the order Entity from the dishName, and the Restaurant Id,
-    // completed - currently hardcoded the customer Id, but after implementing spring Security, get the
-    //           customer Id from the JWT token and fetch it from the database.
     @Override
-    public OrderResponseDto placeOrder(String restName, String dishName, Customers customers) {
+    public OrderResponseDto placeOrder(String restName, String dishName, Customers customers) throws DishNotFoundException {
 
-        Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName,restName).orElseThrow();
+        Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName,restName)
+                .orElseThrow(
+                        () -> new DishNotFoundException("No such Exception found")
+                );
         Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
 
         log.info("Restaurant :{}", restaurant);
@@ -63,27 +68,25 @@ public class OrdersServiceImplementation implements OrdersService {
 
 
     // fetches the order details, based on Order id.
-    // completed, after implementing spring security, before returning the OrderResponseDto, verify that
-    //          the customer id from jwt token is matching with Order ENTITY fetched, if matched
-    //
-    //            return OrderResponseDto, else return null.
     @Override
-    public OrderResponseDto viewOrderDetails(Long orderId, Long customerId) {
+    public OrderResponseDto viewOrderDetails(Long orderId, Long customerId) throws CustomerAccessDeniedException {
         Orders order = ordersRepository.findById(orderId).orElseThrow();
-        if(order.getCustomers().getId()!= customerId) return new OrderResponseDto();
+        if(order.getCustomers().getId()!= customerId) {
+            throw new CustomerAccessDeniedException("");
+        }
         return converter.convertOrderToOrderResponseDto(order);
     }
 
 
     // changes the status of the order,
-    // completed -> after implementing spring security, verify that the restId from Jwt token matches
-    //              with the one present inside the order entity.
     @Override
-    public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus orderStatus, String restName) {
-        Orders order = ordersRepository.findById(orderId).orElseThrow();
+    public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus orderStatus, String restName)
+            throws NoSuchOrderException, RestaurantAccessDeniedException {
+        Orders order = ordersRepository.findById(orderId)
+                .orElseThrow(()-> new NoSuchOrderException("No order with such id" + orderId));
 
         if(!order.getRestaurantName().equals(restName)){
-            return new OrderResponseDto();
+            throw new RestaurantAccessDeniedException("You dont have access to change the order details");
         }
 
         if(order.getStatus()==OrderStatus.DELIVERED){

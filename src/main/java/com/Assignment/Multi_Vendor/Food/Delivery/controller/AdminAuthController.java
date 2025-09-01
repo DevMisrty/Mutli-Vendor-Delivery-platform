@@ -66,7 +66,8 @@ public class AdminAuthController {
                             loginRequestDto.getPassword()
                     )
             );
-            Admin admin = adminRepository.findByEmail(loginRequestDto.getEmail()).orElseThrow();
+            Admin admin = adminRepository.findByEmail(loginRequestDto.getEmail())
+                    .orElseThrow();
             Users users = Users.builder()
                     .email(admin.getEmail())
                     .role(admin.getRole().toString())

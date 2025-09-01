@@ -1,5 +1,8 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerAccessDeniedException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerNotFoundException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
@@ -27,20 +30,21 @@ public class OrderController {
 
 
     // Places the order with restId, and DishId,
-    // pending completed - after applying security, fetch the customer id form the Jwt token, load it from
-    //      customer repository, and add it to Order Entity, Currently, hard placed the value.
     @GetMapping("/placeOrder/{restName}/{dishName}")
     @Transactional
     public ResponseEntity<ApiResponse<OrderResponseDto>> placeOrder(
             @PathVariable String restName, 
             @PathVariable String dishName,
             HttpServletRequest request
-            ){
+            ) throws CustomerNotFoundException, DishNotFoundException {
 
         String token = request.getHeader("Authorization").substring(7);
         String emailFromToken = jwtUtility.getEmailFromToken(token);
 
-        Customers customer = customerRepository.findByEmail(emailFromToken).orElseThrow();
+        Customers customer = customerRepository.findByEmail(emailFromToken)
+                .orElseThrow(
+                        () -> new CustomerNotFoundException("No such customer found")
+                );
 
         OrderResponseDto orderPlaced = ordersService.placeOrder(restName, dishName,customer);
 
@@ -54,12 +58,17 @@ public class OrderController {
     }
 
     @GetMapping("/view/{orderId}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails(@PathVariable Long orderId, HttpServletRequest request){
+    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails(@PathVariable Long orderId,
+                                                                          HttpServletRequest request)
+            throws CustomerNotFoundException, CustomerAccessDeniedException {
 
         String token = request.getHeader("Authorization").substring(7);
         String emailFromToken = jwtUtility.getEmailFromToken(token);
 
-        Customers customer = customerRepository.findByEmail(emailFromToken).orElseThrow();
+        Customers customer = customerRepository.findByEmail(emailFromToken)
+                .orElseThrow(
+                        ()-> new CustomerNotFoundException("No such customer found")
+                );
 
         OrderResponseDto order = ordersService.viewOrderDetails(orderId, customer.getId());
 

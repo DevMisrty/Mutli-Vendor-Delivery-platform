@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DishesRepository extends ListCrudRepository<Dishes, Long> {
-    List<Dishes> findByCuisine(Cuisine cuisine);
+    Optional<List<Dishes>> findByCuisine(Cuisine cuisine);
 
     List<Dishes> findByRatingGreaterThanEqual(Integer star);
 

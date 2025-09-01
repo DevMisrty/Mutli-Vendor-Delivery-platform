@@ -18,16 +18,14 @@ public class OTPAuthService {
     @Value("${spring.mail.username}")
     private String from;
 
-    public void sendMail(EmailDetailsDto detailsDto){
+    public void sendMail(EmailDetailsDto detailsDto, int otp){
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setFrom(from);
         mail.setTo(detailsDto.getTo());
         mail.setText("""
                 This mail is for 2-step authentication, pls note down the one time password
-                
-                123456
-                """);
+                """+ otp);
         mail.setSubject("2-Step Authentication. ");
 
         mailSender.send(mail);

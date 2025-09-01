@@ -1,7 +1,9 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectCredentialsException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
+import com.Assignment.Multi_Vendor.Food.Delivery.configuration.FoodDeliveryPlatform;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
@@ -32,8 +34,12 @@ public class RestaurantOwnerAuthController {
     private final JwtUtility jwtUtility;
     private final OTPAuthService oTPAuthService;
 
+    private Integer otp;
+    private String email;
+
     @PostMapping("/rest/signin")
-    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto) throws RestaurantNameAlreadyTakenException {
+    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto)
+            throws RestaurantNameAlreadyTakenException {
         Restaurant rest = modelMapper.map(restaurantOwnerDto, Restaurant.class);
         rest.setPassword(passwordEncoder.encode(rest.getPassword()));
         rest.setRole(ROLE.RESTAURANT_OWNER);
@@ -71,7 +77,10 @@ public class RestaurantOwnerAuthController {
                 .to(requestDto.getEmail())
                 .build();
 
-        oTPAuthService.sendMail(emailDetails);
+        email = requestDto.getEmail();
+        otp = FoodDeliveryPlatform.generateOtp();
+
+        oTPAuthService.sendMail(emailDetails, otp);
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -85,15 +94,9 @@ public class RestaurantOwnerAuthController {
 
 
     @PostMapping("/rest/otpverification")
-    public ResponseEntity<ApiResponse<?>> getOtpVerify(@RequestBody OtpRequestDto requestDto)
-    {
-        if(requestDto.getOtp()!=123456){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse<>(
-                            HttpStatus.BAD_REQUEST.value(),
-                            "Provided otp is incorrect, pls login again"
-                            ));
+    public ResponseEntity<ApiResponse<?>> getOtpVerify(@RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException {
+        if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
+            throw new IncorrectCredentialsException("pls provide correct information. ");
         }
 
         Restaurant rest = restaurantService.getRestaurantByEmail(requestDto.getEmail());

@@ -12,4 +12,5 @@ public class MultiVendorFoodDeliveryApplication {
 		SpringApplication.run(MultiVendorFoodDeliveryApplication.class, args);
  	}
 
+
 }

@@ -22,4 +22,7 @@ public class FoodDeliveryPlatform {
         return new BCryptPasswordEncoder();
     }
 
+    public static Integer generateOtp(){
+        return (int)(Math.random() * 1000000);
+    }
 }

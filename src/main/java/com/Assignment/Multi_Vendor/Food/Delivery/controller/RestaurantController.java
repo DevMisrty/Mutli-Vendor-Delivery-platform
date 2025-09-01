@@ -1,6 +1,9 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectInputException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.MenuRequestDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantRequestDto;
@@ -27,25 +30,13 @@ public class RestaurantController {
     private final ModelMapper modelMapper;
     private final RestaurantService restaurantService;
 
-    // Adds the new restaurant to Be approved by admin
-//    @PostMapping("/addRestaurant")
-    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto) throws RestaurantNameAlreadyTakenException {
-        Restaurant restaurant = modelMapper.map(restaurantRequestDto, Restaurant.class);
-        log.info("restaurant : {}",restaurant);
-        restaurant = restaurantService.addNewRestaurant(restaurant);
-        RestaurantResponseDTO responseDto = modelMapper.map(restaurant, RestaurantResponseDTO.class);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        HttpStatus.CREATED.value(),
-                        "Restaurant added. Pls wait for admin to approve. ",
-                        responseDto
-                ));
-    }
 
     // Adds the new Menu, replacing the old menu, if present.
     @PostMapping("/addMenu/{restId}")
-    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewMenu(@RequestBody MenuRequestDto menurequestDto, @PathVariable Long restId){
+    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewMenu
+            (@RequestBody MenuRequestDto menurequestDto,
+             @PathVariable Long restId) throws RestaurantNotFoundException {
+
         log.info("List<Dishes> : {}", menurequestDto.getMenu());
         Restaurant restaurant = restaurantService.addNewMenu(menurequestDto.getMenu(), restId);
         RestaurantResponseDTO response = modelMapper.map(restaurant, RestaurantResponseDTO.class);
@@ -63,8 +54,8 @@ public class RestaurantController {
     @PostMapping("/addDishes/{restId}")
     public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewDishesInMenu(
             @RequestBody List<Dishes> dishes,
-            @PathVariable Long restId){
-        log.info("jkguyagewuhyvcyuev");
+            @PathVariable Long restId) throws IncorrectInputException, RestaurantNotFoundException {
+
         Restaurant restaurant = restaurantService.addDishesToMenu(dishes, restId);
         RestaurantResponseDTO responseDto = modelMapper.map(restaurant, RestaurantResponseDTO.class);
         log.info("Restaurant : {}", responseDto);
@@ -81,7 +72,7 @@ public class RestaurantController {
     @DeleteMapping("/deleteDish/{restName}/{dishName}")
     public ResponseEntity<ApiResponse<RestaurantResponseDTO>> deleteDishFromMenu(
             @PathVariable String restName,
-            @PathVariable String dishName){
+            @PathVariable String dishName) throws RestaurantNotFoundException, DishNotFoundException {
         Restaurant restaurant = restaurantService.removeDishFromMenu(restName, dishName);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -89,6 +80,6 @@ public class RestaurantController {
                         HttpStatus.ACCEPTED.value(),
                         "Dish has been removed from the menu. ",
                         modelMapper.map(restaurant,RestaurantResponseDTO.class)
-                ) );
+                ));
     }
 }

@@ -3,6 +3,6 @@ package com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.Excepti
 
 public class RestaurantNotFoundException extends Exception {
 
-    public RestaurantNotFoundException() {
+    public RestaurantNotFoundException(String s) {
     }
 }

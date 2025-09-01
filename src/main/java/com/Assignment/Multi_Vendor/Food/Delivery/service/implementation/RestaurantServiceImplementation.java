@@ -1,5 +1,7 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.service.implementation;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectInputException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
@@ -15,7 +17,6 @@ import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.Exceptio
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +34,7 @@ public class RestaurantServiceImplementation implements RestaurantService {
     @Override
     public Restaurant approvedRestaurant(Long restId) throws RestaurantNotFoundException {
         Restaurant restaurant = restaurantRepository.findById(restId)
-                .orElseThrow(()-> new RestaurantNotFoundException());
+                .orElseThrow(()-> new RestaurantNotFoundException("No such Restaurant found, Pls enter valid restaurant id"));
         restaurant.setStatus(STATUS.APPROVED);
         return restaurantRepository.save(restaurant);
     }
@@ -47,9 +48,9 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant addNewMenu(List<Dishes> menu, Long restId) {
+    public Restaurant addNewMenu(List<Dishes> menu, Long restId) throws RestaurantNotFoundException {
         Restaurant restaurant = restaurantRepository.findById                                                                                      (restId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found"));
 
         List<Dishes> existingMenu = restaurant.getMenu();
         if (existingMenu == null) {
@@ -68,8 +69,15 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant addDishesToMenu(List<Dishes> dishes, Long restId) {
-        Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+    public Restaurant addDishesToMenu(List<Dishes> dishes, Long restId)
+            throws RestaurantNotFoundException, IncorrectInputException {
+        Restaurant restaurant = restaurantRepository.findById(restId)
+                .orElseThrow(
+                        ()-> new RestaurantNotFoundException("No Such Resturant found")
+                );
+        if(dishes.isEmpty()){
+            throw new IncorrectInputException("Pls enter at-least one Dish ");
+        }
         for (Dishes dish : dishes) {
             dish.setRestaurant(restaurant);
         }
@@ -83,17 +91,20 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant removeDishFromMenu(String restName, String dishName) {
-        Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName, restName).orElseThrow();
-        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
+    public Restaurant removeDishFromMenu(String restName, String dishName) throws DishNotFoundException, RestaurantNotFoundException {
+        Dishes dish = dishesRepository.findByNameAndRestaurant_RestaurantName(dishName, restName)
+                .orElseThrow(()-> new DishNotFoundException("No such dish found, from specified restaurant"));
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such Restaurant found"));
         restaurant.getMenu().remove(dish);
         dishesRepository.deleteById(dish.getId());
         return restaurantRepository.save(restaurant);
     }
 
     @Override
-    public Restaurant disApproveTheRestaurant(Long restId) {
-        Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+    public Restaurant disApproveTheRestaurant(Long restId) throws RestaurantNotFoundException {
+        Restaurant restaurant = restaurantRepository.findById(restId)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such Restaurant found, Pls enter valid restaurant id"));
         if(restaurant.getStatus()== STATUS.NOT_APPROVED) {
             return restaurant;
         }
@@ -108,8 +119,9 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant addRatingToRest(String restName, Float ratings) {
-        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName).orElseThrow();
+    public Restaurant addRatingToRest(String restName, Float ratings) throws RestaurantNotFoundException {
+        Restaurant restaurant = restaurantRepository.findByRestaurantName(restName)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such restaurant found"));
         Float newRating =
                 ((((restaurant.getRatings() * restaurant.getCount()) + ratings) / (restaurant.getCount() + 1)));
         restaurant.setRatings(newRating);
@@ -125,6 +137,17 @@ public class RestaurantServiceImplementation implements RestaurantService {
     @Override
     public Optional<Restaurant> getRestaurantByName(String restsName) {
        return restaurantRepository.findByRestaurantName(restsName);
+    }
+
+    @Override
+    public Restaurant checkIfRestaurantExists(String email) throws RestaurantNotFoundException {
+        return restaurantRepository.findByEmail(email)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such restaurant found."));
+    }
+
+    @Override
+    public Restaurant checkIfRestaurantExistsAndApproved(String restsName) {
+        return restaurantRepository.findByRestaurantNameAndStatus(restsName,STATUS.APPROVED);
     }
 
 
