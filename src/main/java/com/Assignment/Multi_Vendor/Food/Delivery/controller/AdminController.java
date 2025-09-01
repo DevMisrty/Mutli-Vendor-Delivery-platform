@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.AdminRestaurantResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantResponseDTO;
@@ -42,20 +43,23 @@ public class AdminController {
 
     // approves the restaurants, by changing the status, NOT_APPROVED -> APPROVED.
     @GetMapping("/approved/{restId}")
-    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> approveTheRestaurant(@PathVariable Long restId){
+    public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> approveTheRestaurant(@PathVariable Long restId) throws RestaurantNotFoundException {
+
         Restaurant restaurant = restaurantService.approvedRestaurant(restId);
         AdminRestaurantResponseDto response = modelMapper.map(restaurant, AdminRestaurantResponseDto.class);
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
-                        restId + " has been approved. ",
-                        response
-                ));
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body(new ApiResponse<>(
+                            HttpStatus.ACCEPTED.value(),
+                            restId + " has been approved. ",
+                            response
+                    ));
+
     }
 
     @GetMapping("/disapproved/{restId}")
     public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> disapproveTheRestaurant(@PathVariable Long restId){
+
         Restaurant restaurant = restaurantService.disApproveTheRestaurant(restId);
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

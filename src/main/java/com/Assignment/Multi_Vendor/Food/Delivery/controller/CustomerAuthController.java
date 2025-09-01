@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.UserNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
@@ -37,7 +38,7 @@ public class CustomerAuthController {
     private OTPAuthService oTPAuthService;
 
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto){
+    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto) throws UserNameAlreadyTakenException {
         Customers customer = modelMapper.map(customerDto, Customers.class);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         Customers customers = customerService.addNewCustomer(customer);

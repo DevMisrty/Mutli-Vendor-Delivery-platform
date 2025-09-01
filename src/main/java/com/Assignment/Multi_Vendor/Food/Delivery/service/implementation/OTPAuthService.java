@@ -1,6 +1,7 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.service.implementation;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.EmailDetailsDto;
+import com.Assignment.Multi_Vendor.Food.Delivery.model.Orders;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,18 @@ public class OTPAuthService {
         mail.setSubject("2-Step Authentication. ");
 
         mailSender.send(mail);
+    }
+
+    public void mailSender(EmailDetailsDto detailsDto, Orders orders){
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setFrom(from);
+        message.setTo(detailsDto.getTo());
+        message.setText("Your order, " + orders.getDishName() + ", from restaurant," + orders.getRestaurantName()
+                + " has been delivered to you by delivery agent" + orders.getAgent().getFirstName()
+        );
+
+        mailSender.send(message);
     }
 
 }

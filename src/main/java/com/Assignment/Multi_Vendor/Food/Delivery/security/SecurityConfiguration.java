@@ -38,7 +38,10 @@ public class SecurityConfiguration {
                                 .requestMatchers("/order/**",
                                         "/feedback/**").hasRole("CUSTOMER")
                                 .requestMatchers("/rest/**").hasRole("RESTAURANT_OWNER")
-                                .requestMatchers("/auth/**","/menu/**").permitAll()
+                                .requestMatchers("/auth/**","/menu/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html").permitAll()
 
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

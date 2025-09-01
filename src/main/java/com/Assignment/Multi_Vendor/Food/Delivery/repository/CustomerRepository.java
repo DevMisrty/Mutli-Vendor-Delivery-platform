@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends ListCrudRepository<Customers, Long> {
     Optional<Customers> findByEmail(String email);
+
+    boolean existsCustomersByEmail(String email);
 }

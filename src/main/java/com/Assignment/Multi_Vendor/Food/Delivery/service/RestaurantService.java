@@ -1,5 +1,7 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.service;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 
@@ -10,9 +12,9 @@ public interface RestaurantService {
 
     List<Restaurant> getAllNotApprovedRestaurant();
 
-    Restaurant approvedRestaurant(Long restId);
+    Restaurant approvedRestaurant(Long restId) throws RestaurantNotFoundException;
 
-    Restaurant addNewRestaurant(Restaurant restaurant);
+    Restaurant addNewRestaurant(Restaurant restaurant) throws RestaurantNameAlreadyTakenException;
 
     Restaurant addNewMenu(List<Dishes> menu, Long restId);
 

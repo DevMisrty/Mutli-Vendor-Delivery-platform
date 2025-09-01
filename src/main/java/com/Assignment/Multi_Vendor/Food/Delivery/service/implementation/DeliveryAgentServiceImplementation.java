@@ -36,7 +36,7 @@ public class DeliveryAgentServiceImplementation implements DeliveryAgentService 
         for(DeliveryAgent agent: agents){
             if(agent.getAvaibilty().before(new Date())){
                 order.setAgent(agent);
-                agent.setAvaibilty(new Date(System.currentTimeMillis() + 1000 * 60 * 20));
+                agent.setAvaibilty(new Date(System.currentTimeMillis() + 1000 * 60 * 2));
                 ordersRepository.save(order);
                 deliveryAgentRepository.save(agent);
                 break;

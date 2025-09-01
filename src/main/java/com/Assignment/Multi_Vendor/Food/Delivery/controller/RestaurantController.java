@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.MenuRequestDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantRequestDto;
@@ -28,7 +29,7 @@ public class RestaurantController {
 
     // Adds the new restaurant to Be approved by admin
 //    @PostMapping("/addRestaurant")
-    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto){
+    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewRestaurant(@RequestBody RestaurantRequestDto restaurantRequestDto) throws RestaurantNameAlreadyTakenException {
         Restaurant restaurant = modelMapper.map(restaurantRequestDto, Restaurant.class);
         log.info("restaurant : {}",restaurant);
         restaurant = restaurantService.addNewRestaurant(restaurant);

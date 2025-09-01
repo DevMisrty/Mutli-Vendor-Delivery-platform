@@ -35,7 +35,7 @@ public class Orders {
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PLACED;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cutomer_id")
     private Customers customers;
 

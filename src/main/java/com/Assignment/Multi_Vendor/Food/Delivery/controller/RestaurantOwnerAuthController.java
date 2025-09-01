@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
@@ -32,7 +33,7 @@ public class RestaurantOwnerAuthController {
     private final OTPAuthService oTPAuthService;
 
     @PostMapping("/rest/signin")
-    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto){
+    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto) throws RestaurantNameAlreadyTakenException {
         Restaurant rest = modelMapper.map(restaurantOwnerDto, Restaurant.class);
         rest.setPassword(passwordEncoder.encode(rest.getPassword()));
         rest.setRole(ROLE.RESTAURANT_OWNER);
@@ -50,12 +51,21 @@ public class RestaurantOwnerAuthController {
 
     @PostMapping("/rest/login")
     public ResponseEntity<ApiResponse<?>> authenticateRestaurantOwner(@RequestBody LoginRequestDto requestDto){
-        ownerAuthenticateManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        requestDto.getEmail(),
-                        requestDto.getPassword()
-                )
-        );
+        try{
+            ownerAuthenticateManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            requestDto.getEmail(),
+                            requestDto.getPassword()
+                    )
+            );
+        }catch (Exception e){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(
+                            HttpStatus.BAD_REQUEST.value(),
+                            "Invalid Credentials, pls try again with proper credentials. "
+                    ));
+        }
 
         EmailDetailsDto emailDetails = EmailDetailsDto.builder()
                 .to(requestDto.getEmail())

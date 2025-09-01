@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.service.implementation;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.STATUS;
@@ -9,6 +10,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +31,24 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant approvedRestaurant(Long restId) {
-        Restaurant restaurant = restaurantRepository.findById(restId).orElseThrow();
+    public Restaurant approvedRestaurant(Long restId) throws RestaurantNotFoundException {
+        Restaurant restaurant = restaurantRepository.findById(restId)
+                .orElseThrow(()-> new RestaurantNotFoundException());
         restaurant.setStatus(STATUS.APPROVED);
         return restaurantRepository.save(restaurant);
     }
 
     @Override
-    public Restaurant addNewRestaurant(Restaurant restaurant) {
+    public Restaurant addNewRestaurant(Restaurant restaurant) throws RestaurantNameAlreadyTakenException {
+        if(restaurantRepository.existsByRestaurantName(restaurant.getRestaurantName())){
+            throw new RestaurantNameAlreadyTakenException();
+        }
         return restaurantRepository.save(restaurant);
     }
 
     @Override
     public Restaurant addNewMenu(List<Dishes> menu, Long restId) {
-        Restaurant restaurant = restaurantRepository.findById(restId)
+        Restaurant restaurant = restaurantRepository.findById                                                                                      (restId)
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
         List<Dishes> existingMenu = restaurant.getMenu();

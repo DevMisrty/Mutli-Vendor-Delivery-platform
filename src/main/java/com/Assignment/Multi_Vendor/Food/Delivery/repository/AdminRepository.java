@@ -12,4 +12,6 @@ import java.util.Optional;
 public interface AdminRepository extends ListCrudRepository<Admin,Long> {
 
     Optional<Admin> findByEmail(String username);
+
+    boolean existsByEmail(String email);
 }

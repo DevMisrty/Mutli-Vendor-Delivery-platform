@@ -15,4 +15,6 @@ public interface RestaurantRepository extends ListCrudRepository<Restaurant,Long
     Optional<Restaurant> findByRestaurantName(String name);
 
     Optional<Restaurant> findByEmail(String email);
+
+    boolean existsByRestaurantName(String restaurantName);
 }

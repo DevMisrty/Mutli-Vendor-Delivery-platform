@@ -1,5 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.schedular;
 
+import com.Assignment.Multi_Vendor.Food.Delivery.dto.EmailDetailsDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.DeliveryAgent;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.OrderStatus;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Orders;
@@ -7,6 +8,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.repository.DeliveryAgentReposit
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.OrdersRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DeliveryAgentService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.OrdersService;
+import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +28,7 @@ public class DeliverySchedular {
     private final OrdersService ordersService;
     private final OrdersRepository ordersRepository;
     private final DeliveryAgentRepository deliveryAgentRepository;
+    private final OTPAuthService mailService;
 
 
     @Scheduled( cron = "0 * * * * *")
@@ -57,7 +60,7 @@ public class DeliverySchedular {
         for(Orders order : outForDeliveryOrders){
 
             if(order.getAgent()!=null){
-                log.info(" agent " + order.getAgent().getFirstName() +
+                log.info(" agent Name  " + order.getAgent().getFirstName() +
                         order.getAgent().getLastName() + " is assigned to order " + order.getOrderId());
                 continue;
             }
@@ -71,7 +74,7 @@ public class DeliverySchedular {
             ordersRepository.save(order);
             deliveryAgentRepository.save(agent);
 
-            log.info("{}, order has been assigned to {} delivery agent. " , order.getOrderId(),agent.getFirstName() + agent.getLastName());
+            log.info("Order Id,{} has been assigned to  delivery agent, {} " , order.getOrderId(),agent.getFirstName() + agent.getLastName());
         }
     }
 
@@ -84,7 +87,17 @@ public class DeliverySchedular {
                 .filter(order -> order
                         .getAgent().getAvaibilty().before(new Date()))
                 .collect(Collectors.toList());
+        if(orders.isEmpty()){
+            log.info("No order is set to out_for_delivery. ");
+            return;
+        }
         for (Orders order : orders){
+
+            EmailDetailsDto dto = EmailDetailsDto.builder()
+                    .to(order.getCustomers().getEmail())
+                    .build();
+
+            mailService.mailSender(dto,order);
             order.setStatus(OrderStatus.DELIVERED);
             order.setAgent(null);
             ordersRepository.save(order);

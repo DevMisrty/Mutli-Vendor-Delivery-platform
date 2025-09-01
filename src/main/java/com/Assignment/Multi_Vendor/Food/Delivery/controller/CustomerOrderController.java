@@ -44,9 +44,6 @@ public class CustomerOrderController {
 
         OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
         OrderResponseDto orderResponse = ordersService.changeOrderStatus(orderId, orderStatus, restaurant.getRestaurantName());
-        if(orderStatus.equals(OrderStatus.OUT_FOR_DELIVERY)){
-            deliveryAgentService.assignDeliveryAgent(orderId);
-        }
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body( new ApiResponse<>(
