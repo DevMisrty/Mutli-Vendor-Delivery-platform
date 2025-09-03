@@ -10,6 +10,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.RestaurantRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
@@ -38,7 +39,8 @@ public class RestaurantOwnerAuthController {
     private String email;
 
     @PostMapping("/rest/signin")
-    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(@RequestBody RestaurantOwnerDto restaurantOwnerDto)
+    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(
+            @Valid @RequestBody RestaurantOwnerDto restaurantOwnerDto)
             throws RestaurantNameAlreadyTakenException {
         Restaurant rest = modelMapper.map(restaurantOwnerDto, Restaurant.class);
         rest.setPassword(passwordEncoder.encode(rest.getPassword()));
@@ -56,7 +58,8 @@ public class RestaurantOwnerAuthController {
     }
 
     @PostMapping("/rest/login")
-    public ResponseEntity<ApiResponse<?>> authenticateRestaurantOwner(@RequestBody LoginRequestDto requestDto){
+    public ResponseEntity<ApiResponse<?>> authenticateRestaurantOwner(
+            @Valid @RequestBody LoginRequestDto requestDto){
         try{
             ownerAuthenticateManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -94,7 +97,7 @@ public class RestaurantOwnerAuthController {
 
 
     @PostMapping("/rest/otpverification")
-    public ResponseEntity<ApiResponse<?>> getOtpVerify(@RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException {
+    public ResponseEntity<ApiResponse<?>> getOtpVerify(@Valid @RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException {
         if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
             throw new IncorrectCredentialsException("pls provide correct information. ");
         }

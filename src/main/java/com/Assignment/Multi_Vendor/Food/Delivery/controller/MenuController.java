@@ -49,7 +49,8 @@ public class MenuController {
     }
 
     @GetMapping("/cuisine/{cuisine}")
-    public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnCuisine(@PathVariable String cuisine )
+    public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnCuisine
+            (@PathVariable String cuisine )
             throws NoSuchCuisineFound {
 
         Cuisine selectedCuisine = Cuisine.valueOf(cuisine.toUpperCase());
@@ -65,7 +66,8 @@ public class MenuController {
     }
 
     @GetMapping("/rating/{star}")
-    public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnRating(@PathVariable Integer star)
+    public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnRating
+            (@PathVariable Integer star)
             throws IncorrectInputException {
         List<DishesResponseDto> menu = dishesService.getMenuBasedOnStar(star);
 

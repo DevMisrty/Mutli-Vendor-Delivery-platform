@@ -11,6 +11,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantResponseDTO;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -34,7 +35,7 @@ public class RestaurantController {
     // Adds the new Menu, replacing the old menu, if present.
     @PostMapping("/addMenu/{restId}")
     public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewMenu
-            (@RequestBody MenuRequestDto menurequestDto,
+            (@Valid @RequestBody MenuRequestDto menurequestDto,
              @PathVariable Long restId) throws RestaurantNotFoundException {
 
         log.info("List<Dishes> : {}", menurequestDto.getMenu());
@@ -51,9 +52,9 @@ public class RestaurantController {
     }
 
     // Adds the new Dish in the existing menu.
-    @PostMapping("/addDishes/{restId}")
+     @PostMapping("/addDishes/{restId}")
     public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addNewDishesInMenu(
-            @RequestBody List<Dishes> dishes,
+            @Valid @RequestBody List<Dishes> dishes,
             @PathVariable Long restId) throws IncorrectInputException, RestaurantNotFoundException {
 
         Restaurant restaurant = restaurantService.addDishesToMenu(dishes, restId);

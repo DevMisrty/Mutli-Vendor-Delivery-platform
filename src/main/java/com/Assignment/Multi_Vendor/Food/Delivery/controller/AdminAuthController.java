@@ -8,13 +8,12 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.Users;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Admin;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.AdminRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.jpa.EntityManagerFactoryInfo;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,12 +30,11 @@ public class AdminAuthController {
     private final AdminRepository adminRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
-    private final EntityManagerFactoryInfo entityManagerFactoryInfo;
     private final JwtUtility jwtUtility;
 
     // for creating the admin entity inside the database, to get proper salt value for the BCrypt encoder.
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<?>> addNewAdmin(@RequestBody LoginRequestDto requestDto) throws UserNameAlreadyTakenException {
+    public ResponseEntity<ApiResponse<?>> addNewAdmin( @Valid @RequestBody LoginRequestDto requestDto) throws UserNameAlreadyTakenException {
 
         Admin admin = modelMapper.map(requestDto, Admin.class);
         admin.setRole(ROLE.ADMIN);
@@ -58,9 +56,9 @@ public class AdminAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateAdmin(@RequestBody LoginRequestDto loginRequestDto) {
+    public ResponseEntity<?> authenticateAdmin( @Valid  @RequestBody LoginRequestDto loginRequestDto) {
         try{
-            Authentication authenticate = adminAuthenticationManager.authenticate(
+            adminAuthenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getEmail(),
                             loginRequestDto.getPassword()

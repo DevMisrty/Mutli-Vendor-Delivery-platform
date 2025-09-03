@@ -51,15 +51,16 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
+                         HttpStatus.ACCEPTED.value(),
                         "Order has been placed, with order id as " + orderPlaced.getOrderId(),
                         orderPlaced
                 ));
     }
 
     @GetMapping("/view/{orderId}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails(@PathVariable Long orderId,
-                                                                          HttpServletRequest request)
+    public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails
+            (@PathVariable Long orderId,
+             HttpServletRequest request)
             throws CustomerNotFoundException, CustomerAccessDeniedException {
 
         String token = request.getHeader("Authorization").substring(7);

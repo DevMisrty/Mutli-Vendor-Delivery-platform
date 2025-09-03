@@ -9,6 +9,7 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.CustomerService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class CustomerAuthController {
     private String email;
 
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@RequestBody CustomerDto customerDto)
+    public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@Valid @RequestBody CustomerDto customerDto)
             throws UserNameAlreadyTakenException {
         Customers customer = modelMapper.map(customerDto, Customers.class);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
@@ -52,7 +53,7 @@ public class CustomerAuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginCustomer(@RequestBody LoginRequestDto loginRequestDto){
+    public ResponseEntity<?> loginCustomer(@Valid @RequestBody LoginRequestDto loginRequestDto){
 
         try {
             customerAuthenticationManager.authenticate(
@@ -94,11 +95,11 @@ public class CustomerAuthController {
     }
 
     @PostMapping("/otpverification")
-    public ResponseEntity<ApiResponse<?>> otpVerification(@RequestBody OtpRequestDto requestDto)
+    public ResponseEntity<ApiResponse<?>> otpVerification(@Valid @RequestBody OtpRequestDto requestDto)
             throws IncorrectCredentialsException {
 
         if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
-
+ 
             throw new IncorrectCredentialsException("Incorrect OTP, Pls enter correct otp.");
         }
 
