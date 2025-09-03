@@ -3,7 +3,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.NoSuchOrderException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantAccessDeniedException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
-import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
+import com.Assignment.Multi_Vendor.Food.Delivery.JWT.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.OrderStatus;

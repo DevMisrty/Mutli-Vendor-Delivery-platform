@@ -2,7 +2,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectCredentialsException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.UserNameAlreadyTakenException;
-import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
+import com.Assignment.Multi_Vendor.Food.Delivery.JWT.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.configuration.FoodDeliveryPlatform;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
@@ -12,11 +12,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthS
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.jpa.EntityManagerFactoryInfo;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;

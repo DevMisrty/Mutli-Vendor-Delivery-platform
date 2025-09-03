@@ -3,7 +3,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerAccessDeniedException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
-import com.Assignment.Multi_Vendor.Food.Delivery.JWt.JwtUtility;
+import com.Assignment.Multi_Vendor.Food.Delivery.JWT.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;

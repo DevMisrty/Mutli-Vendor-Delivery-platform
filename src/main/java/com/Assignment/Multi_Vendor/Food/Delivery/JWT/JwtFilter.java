@@ -1,4 +1,4 @@
-package com.Assignment.Multi_Vendor.Food.Delivery.JWt;
+package com.Assignment.Multi_Vendor.Food.Delivery.JWT;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

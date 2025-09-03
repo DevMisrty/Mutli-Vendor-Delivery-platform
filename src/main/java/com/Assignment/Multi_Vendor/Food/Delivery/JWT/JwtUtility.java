@@ -1,9 +1,8 @@
-package com.Assignment.Multi_Vendor.Food.Delivery.JWt;
+package com.Assignment.Multi_Vendor.Food.Delivery.JWT;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.Users;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
