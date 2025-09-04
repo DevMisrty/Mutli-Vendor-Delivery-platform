@@ -67,7 +67,7 @@ public class MenuController {
 
     @GetMapping("/rating/{star}")
     public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnRating
-            (@PathVariable Integer star)
+            (@PathVariable Float star)
             throws IncorrectInputException {
         List<DishesResponseDto> menu = dishesService.getMenuBasedOnStar(star);
 

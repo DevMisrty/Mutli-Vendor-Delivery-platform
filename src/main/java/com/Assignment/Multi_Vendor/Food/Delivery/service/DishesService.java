@@ -11,7 +11,7 @@ public interface DishesService {
 
     List<DishesResponseDto> getMenuBasedOnCuisine(Cuisine selectedCuisine) throws NoSuchCuisineFound;
 
-    List<DishesResponseDto> getMenuBasedOnStar(Integer star) throws IncorrectInputException;
+    List<DishesResponseDto> getMenuBasedOnStar(Float star) throws IncorrectInputException;
 
     Dishes addRatingsToDish(String restName, String dishName, Float ratings);
 }

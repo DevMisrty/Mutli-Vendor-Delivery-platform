@@ -37,9 +37,9 @@ public class DishesServiceImplementation implements DishesService {
     }
 
     @Override
-    public List<DishesResponseDto> getMenuBasedOnStar(Integer star) throws IncorrectInputException {
+    public List<DishesResponseDto> getMenuBasedOnStar(Float star) throws IncorrectInputException {
         if(star<0 || star >5){
-            throw new IncorrectInputException(" Pls enter correct rating. ");
+            throw new IncorrectInputException(" Pls enter correct rating.");
         }
         List<Dishes> dishes = dishesRepository.findByRatingGreaterThanEqual(star);
 

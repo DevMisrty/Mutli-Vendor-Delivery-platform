@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface DishesRepository extends ListCrudRepository<Dishes, Long> {
     Optional<List<Dishes>> findByCuisine(Cuisine cuisine);
 
-    List<Dishes> findByRatingGreaterThanEqual(Integer star);
+    List<Dishes> findByRatingGreaterThanEqual(Float star);
 
     Optional<Dishes> findByNameAndRestaurant_Id(String name, Long restaurantId);
 

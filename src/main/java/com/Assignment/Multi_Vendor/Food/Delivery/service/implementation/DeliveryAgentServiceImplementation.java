@@ -19,32 +19,7 @@ public class DeliveryAgentServiceImplementation implements DeliveryAgentService 
 
 
     private final DeliveryAgentRepository deliveryAgentRepository;
-    private final OrdersRepository ordersRepository;
 
-
-    @Override
-    public Orders assignDeliveryAgent(Long orderId) {
-
-        List<DeliveryAgent> agents = deliveryAgentRepository.findAll();
-
-        if(agents.isEmpty()){
-            return new Orders();
-        }
-
-        Orders order = ordersRepository.findById(orderId).orElseThrow();
-
-        for(DeliveryAgent agent: agents){
-            if(agent.getAvaibilty().before(new Date())){
-                order.setAgent(agent);
-                agent.setAvaibilty(new Date(System.currentTimeMillis() + 1000 * 60 * 2));
-                ordersRepository.save(order);
-                deliveryAgentRepository.save(agent);
-                break;
-            }
-        }
-
-        return order;
-    }
 
     @Override
     public List<DeliveryAgent> getAllDeliveryAgents() {

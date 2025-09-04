@@ -7,5 +7,6 @@ public enum Cuisine {
     MEXICAN,
     JAPANESE,
     FRENCH,
+    AMERICAN,
     THAI
 }

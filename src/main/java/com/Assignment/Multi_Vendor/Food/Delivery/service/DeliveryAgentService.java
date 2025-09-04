@@ -6,7 +6,6 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Orders;
 import java.util.*;
 
 public interface DeliveryAgentService {
-    Orders assignDeliveryAgent(Long orderId);
 
     List<DeliveryAgent> getAllDeliveryAgents();
 }

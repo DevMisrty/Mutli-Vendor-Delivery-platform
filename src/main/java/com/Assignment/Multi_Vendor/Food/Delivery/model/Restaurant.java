@@ -53,5 +53,13 @@ public class Restaurant {
                 ", restaurantName='" + restaurantName + '\'' +
                 '}';
     }
+
+    public Restaurant(Long id, String restaurantName, String ownerName, String password, String email) {
+        this.id = id;
+        this.restaurantName = restaurantName;
+        this.ownerName = ownerName;
+        this.password = password;
+        this.email = email;
+    }
 }
 

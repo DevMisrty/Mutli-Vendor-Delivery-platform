@@ -1,8 +1,6 @@
 package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
-import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerAccessDeniedException;
-import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.CustomerNotFoundException;
-import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.DishNotFoundException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.*;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWT.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
@@ -36,7 +34,7 @@ public class OrderController {
             @PathVariable String restName, 
             @PathVariable String dishName,
             HttpServletRequest request
-            ) throws CustomerNotFoundException, DishNotFoundException {
+            ) throws CustomerNotFoundException, DishNotFoundException, RestaurantNotFoundException {
 
         String token = request.getHeader("Authorization").substring(7);
         String emailFromToken = jwtUtility.getEmailFromToken(token);
@@ -61,7 +59,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponseDto>> viewOrderDetails
             (@PathVariable Long orderId,
              HttpServletRequest request)
-            throws CustomerNotFoundException, CustomerAccessDeniedException {
+            throws CustomerNotFoundException, CustomerAccessDeniedException, NoSuchOrderException {
 
         String token = request.getHeader("Authorization").substring(7);
         String emailFromToken = jwtUtility.getEmailFromToken(token);
