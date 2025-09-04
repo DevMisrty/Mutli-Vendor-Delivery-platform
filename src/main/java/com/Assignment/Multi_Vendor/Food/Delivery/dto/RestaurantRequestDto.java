@@ -28,7 +28,6 @@ public class RestaurantRequestDto {
     private String email;
 
     @NotNull
-    @Min(4) @Max(12)
     private String password;
     private List<Cuisine> menu;
     private Float review;

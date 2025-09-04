@@ -20,16 +20,16 @@ public class CustomerDto {
     private String email;
 
     @NotNull
-    @Min(4)
+    @Size(min = 3, message = "Password must be at least 3 characters long")
     private String password;
 
-    @NotNull @Min(3)
+    @NotNull @Size(min = 3, message = " FirstName must be at least 5 characters long")
     private String firstName;
     private String lastName;
 
-    @NotNull @Min(5) @Max(12)
+    @NotNull
     private String phoneNumber;
 
-    @NotNull @Min(5)
+    @NotNull @Size(min = 5, message = "Address must be at least 5 characters long")
     private String address; 
 }

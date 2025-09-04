@@ -18,7 +18,6 @@ public class OtpRequestDto {
     private String email;
 
     @NotNull
-    @Size(min = 4, max = 6)
     private Integer otp;
 
 }
