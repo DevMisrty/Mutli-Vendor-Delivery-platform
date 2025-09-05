@@ -2,6 +2,7 @@ package com.Assignment.Multi_Vendor.Food.Delivery.controller;
 
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.IncorrectCredentialsException;
 import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNameAlreadyTakenException;
+import com.Assignment.Multi_Vendor.Food.Delivery.GlobalExceptionHandler.ExceptionClasses.RestaurantNotFoundException;
 import com.Assignment.Multi_Vendor.Food.Delivery.JWT.JwtUtility;
 import com.Assignment.Multi_Vendor.Food.Delivery.configuration.FoodDeliveryPlatform;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.*;
@@ -94,7 +95,7 @@ public class RestaurantOwnerAuthController {
 
 
     @PostMapping("/rest/otpverification")
-    public ResponseEntity<ApiResponse<?>> getOtpVerify(@Valid @RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException {
+    public ResponseEntity<ApiResponse<?>> getOtpVerify(@Valid @RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException, RestaurantNotFoundException {
         if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
             throw new IncorrectCredentialsException("pls provide correct information. ");
         }

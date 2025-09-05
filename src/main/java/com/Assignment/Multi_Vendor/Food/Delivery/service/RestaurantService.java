@@ -28,13 +28,13 @@ public interface RestaurantService {
 
     Restaurant disApproveTheRestaurant(Long restId) throws RestaurantNotFoundException;
 
-    List<Dishes> getMenuByRestaurantName(String restsName);
+    List<Dishes> getMenuByRestaurantName(String restsName) throws RestaurantNotFoundException;
 
     Restaurant addRatingToRest(String restName, Float ratings) throws RestaurantNotFoundException;
 
-    Restaurant getRestaurantByEmail(String email);
+    Restaurant getRestaurantByEmail(String email) throws RestaurantNotFoundException;
 
-    Optional<Restaurant> getRestaurantByName(String restsName);
+    Restaurant getRestaurantByName(String restsName) throws RestaurantNotFoundException;
 
     Restaurant checkIfRestaurantExists(String email) throws RestaurantNotFoundException;
 

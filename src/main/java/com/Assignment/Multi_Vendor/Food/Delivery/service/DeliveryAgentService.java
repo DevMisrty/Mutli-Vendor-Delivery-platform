@@ -8,4 +8,6 @@ import java.util.*;
 public interface DeliveryAgentService {
 
     List<DeliveryAgent> getAllDeliveryAgents();
+
+    List<DeliveryAgent> getAllDeliveryAgents(Date before);
 }

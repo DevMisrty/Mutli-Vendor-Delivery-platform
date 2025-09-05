@@ -114,8 +114,10 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public List<Dishes> getMenuByRestaurantName(String restsName) {
-        return restaurantRepository.findByRestaurantName(restsName).orElseThrow().getMenu();
+    public List<Dishes> getMenuByRestaurantName(String restsName) throws RestaurantNotFoundException {
+        return restaurantRepository.findByRestaurantName(restsName)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such restaurant found"))
+                .getMenu();
     }
 
     @Override
@@ -130,13 +132,15 @@ public class RestaurantServiceImplementation implements RestaurantService {
     }
 
     @Override
-    public Restaurant getRestaurantByEmail(String email) {
-        return restaurantRepository.findByEmail(email).orElseThrow();
+    public Restaurant getRestaurantByEmail(String email) throws RestaurantNotFoundException {
+        return restaurantRepository.findByEmail(email)
+                .orElseThrow(()-> new RestaurantNotFoundException("No such restaurant found"));
     }
 
     @Override
-    public Optional<Restaurant> getRestaurantByName(String restsName) {
-       return restaurantRepository.findByRestaurantName(restsName);
+    public Restaurant getRestaurantByName(String restsName) throws RestaurantNotFoundException {
+       return restaurantRepository.findByRestaurantName(restsName)
+               .orElseThrow(()-> new RestaurantNotFoundException("No such restaurant found"));
     }
 
     @Override

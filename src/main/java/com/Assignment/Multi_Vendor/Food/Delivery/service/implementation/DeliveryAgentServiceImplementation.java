@@ -25,5 +25,10 @@ public class DeliveryAgentServiceImplementation implements DeliveryAgentService 
     public List<DeliveryAgent> getAllDeliveryAgents() {
         return deliveryAgentRepository.findAll();
     }
+
+    @Override
+    public List<DeliveryAgent> getAllDeliveryAgents(Date before) {
+        return deliveryAgentRepository.findByAvaibiltyBefore(before);
+    }
 }
 

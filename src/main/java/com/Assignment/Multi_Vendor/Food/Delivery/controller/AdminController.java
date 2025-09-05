@@ -60,6 +60,7 @@ public class AdminController {
 
     }
 
+    // disapproves the restaurant, specified by restId
     @GetMapping("/disapproved/{restId}")
     public ResponseEntity<ApiResponse<AdminRestaurantResponseDto>> disapproveTheRestaurant
             (@PathVariable Long restId)

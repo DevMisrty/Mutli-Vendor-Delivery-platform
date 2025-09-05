@@ -31,20 +31,25 @@ public class AssignDeliveryAgentJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         log.info("checkForDeliveryAgentAndAssignOrders, Schedular started");
 
-        List<DeliveryAgent> allDeliveryAgents = deliveryAgentService.getAllDeliveryAgents();
-        List<DeliveryAgent> agents = allDeliveryAgents
-                .stream()
-                .filter(agent ->
-                        agent.getAvaibilty().before(new Date(System.currentTimeMillis())))
-                .collect(Collectors.toList());
+         List<DeliveryAgent> agents =
+                 deliveryAgentService.getAllDeliveryAgents(new Date(System.currentTimeMillis()));
+//        List<DeliveryAgent> allDeliveryAgents = deliveryAgentService.getAllDeliveryAgents();
+//        List<DeliveryAgent> agents = allDeliveryAgents
+//                .stream()
+//                .filter(agent ->
+//                        agent.getAvaibilty().before(new Date(System.currentTimeMillis())))
+//                .collect(Collectors.toList());
         if (agents.isEmpty()) {
             log.info("No Delivery Agent is Available ");
             return;
         }
+
         List<Orders> outForDeliveryOrders = ordersService.getAllOutForDeliveryOrders(agents.size());
         if (outForDeliveryOrders.isEmpty()) {
             log.info("No Order to deliver");
         }
+
+
         int i = 0;
         for (Orders order : outForDeliveryOrders) {
             if (order.getAgent() != null) {
