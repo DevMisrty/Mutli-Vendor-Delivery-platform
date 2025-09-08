@@ -11,6 +11,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.RestaurantResponseDTO;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +44,12 @@ public class RestaurantController {
         Restaurant restaurant = restaurantService.addNewMenu(menurequestDto.getMenu(), restId);
         RestaurantResponseDTO response = modelMapper.map(restaurant, RestaurantResponseDTO.class);
         log.info("Restaurant Info :{}",response);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        HttpStatus.CREATED.value(),
-                        "New Menu has been added, replacing the old menu. ",
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.CREATED,
+                        MessageConstants.MENU_ADDED,
                         response
-                ));
+                );
     }
 
     // Adds the new Dish in the existing menu.
@@ -60,13 +61,12 @@ public class RestaurantController {
         Restaurant restaurant = restaurantService.addDishesToMenu(dishes, restId);
         RestaurantResponseDTO responseDto = modelMapper.map(restaurant, RestaurantResponseDTO.class);
         log.info("Restaurant : {}", responseDto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        HttpStatus.CREATED.value(),
-                        "New Dish has been added to the menu. ",
-                        responseDto
-                ));
+         return ApiResponseGenerator
+                 .generateSuccessfulApiResponse(
+                         HttpStatus.CREATED,
+                         MessageConstants.DISH_ADDED,
+                         responseDto
+                 );
     }
 
     // Deletes the Dish from the Menu.
@@ -75,12 +75,11 @@ public class RestaurantController {
             @PathVariable String restName,
             @PathVariable String dishName) throws RestaurantNotFoundException, DishNotFoundException {
         Restaurant restaurant = restaurantService.removeDishFromMenu(restName, dishName);
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body( new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
-                        "Dish has been removed from the menu. ",
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.ACCEPTED,
+                        MessageConstants.DISH_DELETED,
                         modelMapper.map(restaurant,RestaurantResponseDTO.class)
-                ));
+                );
     }
 }

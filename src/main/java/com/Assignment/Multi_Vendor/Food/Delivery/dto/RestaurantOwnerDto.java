@@ -10,6 +10,5 @@ public class RestaurantOwnerDto {
     private String restaurantName;
     private String ownerName;
     private String email;
-    private String password;
 
 }

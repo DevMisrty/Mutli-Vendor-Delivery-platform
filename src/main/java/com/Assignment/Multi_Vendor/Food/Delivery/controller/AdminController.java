@@ -5,6 +5,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.AdminRestaurantResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.dto.ApiResponse;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -33,13 +35,10 @@ public class AdminController {
                         .map((restaurant ->
                                 modelMapper.map(restaurant, AdminRestaurantResponseDto.class)))
                         .toList();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        " list of All restaurants to be approve",
-                        restaurants
-                ));
+
+        String msg = restaurants.isEmpty()? MessageConstants.NO_RESTAURANTS_TO_APPROVE : MessageConstants.ALL_RESTAURANTS_TO_APPROVE;
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.OK, msg,restaurants);
     }
 
     // approves the restaurants, by changing the status, NOT_APPROVED -> APPROVED.
@@ -50,14 +49,8 @@ public class AdminController {
 
         Restaurant restaurant = restaurantService.approvedRestaurant(restId);
         AdminRestaurantResponseDto response = modelMapper.map(restaurant, AdminRestaurantResponseDto.class);
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
-                        restId + " has been approved. ",
-                        response
-                ));
-
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.ACCEPTED,MessageConstants.RESTAURANT_APPROVED,response);
     }
 
     // disapproves the restaurant, specified by restId
@@ -67,13 +60,8 @@ public class AdminController {
             throws RestaurantNotFoundException {
 
         Restaurant restaurant = restaurantService.disApproveTheRestaurant(restId);
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
-                        restId + " has been disapproved",
-                        modelMapper.map(restaurant, AdminRestaurantResponseDto.class)
-                ));
+        AdminRestaurantResponseDto response = modelMapper.map(restaurant, AdminRestaurantResponseDto.class);        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.ACCEPTED,MessageConstants.RESTAURANT_REJECTED,response);
     }
 
     // Fetches all the restaurants, irrelevant to whether it is approved by admin, or not.
@@ -83,12 +71,7 @@ public class AdminController {
                 .stream()
                 .map(restaurant -> modelMapper.map(restaurant, AdminRestaurantResponseDto.class))
                 .toList();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "List of all restaurants, approved as well as disapproved. ",
-                        allRestaurants
-                ));
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.OK,MessageConstants.ALL_RESTAURANTS_TO_APPROVE,allRestaurants);
     }
 }

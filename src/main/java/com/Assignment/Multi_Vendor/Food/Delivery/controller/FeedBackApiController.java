@@ -9,9 +9,9 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DishesService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/feedback")
 @RequiredArgsConstructor
-public class FeedBackApiController {
+public class FeedBackApiController{
 
     private final RestaurantService restaurantService;
     private final DishesService dishesService;
@@ -43,19 +43,17 @@ public class FeedBackApiController {
         String message = "Ur feedback has been added, Restaurant " + restName +
                 ", DishName "+ dishName +
                 ", Ratings " + dish.getRating();
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        HttpStatus.CREATED.value(),
-                        message,
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.CREATED,
+                        MessageConstants.CREATED,
                         converter.convertDishToDishResponseDto(dish)
-                ));
+                );
     }
 
 
     // adds review to the restaurants
     @GetMapping("/rest/{restName}/{ratings}")
-    public ResponseEntity<ApiResponse<?>> addRatingsToRest(
+    public ResponseEntity<ApiResponse<RestaurantResponseDTO>> addRatingsToRest(
             @PathVariable String restName,
             @PathVariable Float ratings
     ) throws RestaurantNotFoundException {
@@ -64,13 +62,10 @@ public class FeedBackApiController {
 
         String message = " Your feedback has been added, Restaurant " +  restaurant.getRestaurantName()+
                 ", with ratings " + restaurant.getRatings();
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(
-                        HttpStatus.CREATED.value(),
-                        message,
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.CREATED,
+                        MessageConstants.CREATED,
                         modelMapper.map(restaurant, RestaurantResponseDTO.class)
-                ));
+                );
     }
 }

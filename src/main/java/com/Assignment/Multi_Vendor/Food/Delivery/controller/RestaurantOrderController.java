@@ -12,6 +12,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.repository.RestaurantRepository
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DeliveryAgentService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.OrdersService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,12 +50,12 @@ public class RestaurantOrderController {
         OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
         OrderResponseDto orderResponse =
                 ordersService.changeOrderStatus(orderId, orderStatus, restaurant.getRestaurantName());
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body( new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Order Details, after order status changed",
+
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.ORDER_UPDATED,
                         orderResponse
-                ));
+                );
     }
 }

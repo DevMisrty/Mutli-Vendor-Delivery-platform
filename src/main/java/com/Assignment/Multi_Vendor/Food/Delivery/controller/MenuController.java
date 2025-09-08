@@ -8,9 +8,10 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.DishesResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Cuisine;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Dishes;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
-import com.Assignment.Multi_Vendor.Food.Delivery.model.STATUS;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.DishesService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -32,20 +33,19 @@ public class MenuController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/rest/{restsName}")
-    public ResponseEntity<ApiResponse<?>> getMenuOfRestaurant(@PathVariable String restsName)
+    public ResponseEntity<ApiResponse<List<Dishes>>> getMenuOfRestaurant(@PathVariable String restsName)
             throws RestaurantNotFoundException {
         Restaurant restaurant = restaurantService.checkIfRestaurantExistsAndApproved(restsName);
-        if(restaurant==null){
-            throw new RestaurantNotFoundException("No such Restaurant found");
-        }
+            if(restaurant==null){
+                throw new RestaurantNotFoundException("No such Restaurant found");
+            }
         List<Dishes> menu = restaurantService.getMenuByRestaurantName(restsName);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Menu of " + restsName,
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.MENU_FETCH_SUCCESS,
                         menu
-                ));
+                );
     }
 
     @GetMapping("/cuisine/{cuisine}")
@@ -56,13 +56,12 @@ public class MenuController {
         Cuisine selectedCuisine = Cuisine.valueOf(cuisine.toUpperCase());
         List<DishesResponseDto> dishes = dishesService.getMenuBasedOnCuisine(selectedCuisine);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Menu based on " + selectedCuisine,
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.MENU_FETCH_SUCCESS,
                         dishes
-                ));
+                );
     }
 
     @GetMapping("/rating/{star}")
@@ -70,14 +69,12 @@ public class MenuController {
             (@PathVariable Float star)
             throws IncorrectInputException {
         List<DishesResponseDto> menu = dishesService.getMenuBasedOnStar(star);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Menu based on Rating " + star +" or greater ",
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.MENU_FETCH_SUCCESS,
                         menu
-                ));
+                );
     }
 
 }

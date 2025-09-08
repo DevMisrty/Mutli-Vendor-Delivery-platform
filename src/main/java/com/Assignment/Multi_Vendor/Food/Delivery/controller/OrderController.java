@@ -7,6 +7,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.OrderResponseDto;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.OrdersService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,14 +47,12 @@ public class OrderController {
                 );
 
         OrderResponseDto orderPlaced = ordersService.placeOrder(restName, dishName,customer);
-
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(
-                         HttpStatus.ACCEPTED.value(),
-                        "Order has been placed, with order id as " + orderPlaced.getOrderId(),
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.ACCEPTED,
+                        MessageConstants.ORDER_PLACED,
                         orderPlaced
-                ));
+                );
     }
 
     @GetMapping("/view/{orderId}")
@@ -70,13 +70,11 @@ public class OrderController {
                 );
 
         OrderResponseDto order = ordersService.viewOrderDetails(orderId, customer.getId());
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Details of the order "+ order.getOrderId(),
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.ORDER_DETAILS,
                         order
-                ));
+                );
     }
 }

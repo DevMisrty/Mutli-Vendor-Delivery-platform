@@ -9,6 +9,9 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.Customers;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.CustomerRepository;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.CustomerService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
+import jakarta.mail.Message;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -40,13 +43,12 @@ public class CustomerAuthController {
         Customers customer = modelMapper.map(customerDto, Customers.class);
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
         Customers customers = customerService.addNewCustomer(customer);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Your Account has been created",
-                        modelMapper.map(customers, CustomerDto.class)
-                ));
+        CustomerDto responseDto = modelMapper.map(customers, CustomerDto.class);
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.OK,
+                        MessageConstants.USER_CREATED,
+                        responseDto
+                );
     }
 
     @PostMapping("/login")
@@ -68,36 +70,28 @@ public class CustomerAuthController {
             otp = FoodDeliveryPlatform.generateOtp();
 
             oTPAuthService.sendMail(emailDetails, otp);
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ApiResponse<>(
-                            HttpStatus.OK.value(),
-                            "your credentials has been verified, and mail has been send to your email for verification",
-                            "redirect to localhost:8080/auth/customer/otpverification , for verifing the otp"
-                    ));
+            return ApiResponseGenerator
+                    .generateSuccessfulApiResponse(HttpStatus.OK,
+                            MessageConstants.USER_CREATED,
+                            MessageConstants.OTP_SENT
+                    );
         }
         catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid email or password");
+                    .body(MessageConstants.INVALID_CREDENTIALS);
         } catch (UsernameNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found");
-        } catch (DisabledException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Account is disabled");
-        } catch (LockedException ex) {
-            return ResponseEntity.status(HttpStatus.LOCKED)
-                    .body("Account is locked");
+                    .body(MessageConstants.USER_NOT_FOUND);
         }
     }
 
     @PostMapping("/otpverification")
-    public ResponseEntity<ApiResponse<?>> otpVerification(@Valid @RequestBody OtpRequestDto requestDto)
+    public ResponseEntity<ApiResponse<String>> otpVerification(@Valid @RequestBody OtpRequestDto requestDto)
             throws IncorrectCredentialsException {
 
         if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
  
-            throw new IncorrectCredentialsException("Incorrect OTP, Pls enter correct otp.");
+            throw new IncorrectCredentialsException(MessageConstants.OTP_INVALID);
         }
 
         Customers customer = customerRepository.findByEmail(requestDto.getEmail()).orElseThrow();
@@ -106,12 +100,11 @@ public class CustomerAuthController {
                 .email(customer.getEmail())
                 .role(customer.getRole().toString())
                 .build();
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "your credentials has been verified",
-                        jwtUtility.generateAccessToken(users)
-                ));
+        String token = jwtUtility.generateAccessToken(users);
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.OK,
+                        MessageConstants.USER_CREATED,
+                        token
+                );
     }
 }

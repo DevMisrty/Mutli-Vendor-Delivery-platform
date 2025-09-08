@@ -14,10 +14,8 @@ import java.util.List;
 @Builder
 public class AdminRestaurantResponseDto {
 
-    private Long id;
     private String email;
     private String restaurantName;
     private String ownerName;
-    private List<Dishes> menu;
     private STATUS status;
 }

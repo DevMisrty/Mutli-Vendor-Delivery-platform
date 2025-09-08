@@ -10,6 +10,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Restaurant;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.RestaurantService;
 import com.Assignment.Multi_Vendor.Food.Delivery.service.implementation.OTPAuthService;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -37,7 +39,7 @@ public class RestaurantOwnerAuthController {
     private String email;
 
     @PostMapping("/rest/signin")
-    public ResponseEntity<ApiResponse<?>> addNewRestaurantOwner(
+    public ResponseEntity<ApiResponse<RestaurantOwnerDto>> addNewRestaurantOwner(
             @Valid @RequestBody RestaurantOwnerDto restaurantOwnerDto)
             throws RestaurantNameAlreadyTakenException {
         Restaurant rest = modelMapper.map(restaurantOwnerDto, Restaurant.class);
@@ -46,17 +48,16 @@ public class RestaurantOwnerAuthController {
         RestaurantOwnerDto response =
                 modelMapper.map(restaurantService.addNewRestaurant(rest), RestaurantOwnerDto.class);
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body( new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "your account has been created, pls wait for admin to approve ur restaurant",
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.OK,
+                        MessageConstants.RESTAURANT_CREATED,
                         response
-                ));
+                );
     }
 
     @PostMapping("/rest/login")
-    public ResponseEntity<ApiResponse<?>> authenticateRestaurantOwner(
+    public ResponseEntity<ApiResponse<String>> authenticateRestaurantOwner(
             @Valid @RequestBody LoginRequestDto requestDto){
         try{
             ownerAuthenticateManager.authenticate(
@@ -82,20 +83,17 @@ public class RestaurantOwnerAuthController {
         otp = FoodDeliveryPlatform.generateOtp();
 
         oTPAuthService.sendMail(emailDetails, otp);
-
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(
-                        new ApiResponse<>(
-                                HttpStatus.ACCEPTED.value(),
-                                "OTP has been sent to ur mail",
-                                "Pls redirect to /auth/rest/otpVerification url to submit the otp, submit it using query parameter"
-                        ));
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.ACCEPTED,
+                        MessageConstants.OTP_SENT,
+                        MessageConstants.OTP_SENT
+                );
     }
 
 
     @PostMapping("/rest/otpverification")
-    public ResponseEntity<ApiResponse<?>> getOtpVerify(@Valid @RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException, RestaurantNotFoundException {
+    public ResponseEntity<ApiResponse<String>> getOtpVerify(@Valid @RequestBody OtpRequestDto requestDto) throws IncorrectCredentialsException, RestaurantNotFoundException {
         if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
             throw new IncorrectCredentialsException("pls provide correct information. ");
         }
@@ -109,12 +107,11 @@ public class RestaurantOwnerAuthController {
                 .role(rest.getRole().toString())
                 .build();
 
-        return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body(new ApiResponse<>(
-                        HttpStatus.ACCEPTED.value(),
-                        "U have successfully authenticated",
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(
+                        HttpStatus.ACCEPTED,
+                        MessageConstants.OTP_VERIFIED,
                         jwtUtility.generateAccessToken(users)
-                ));
+                );
     }
 }

@@ -8,6 +8,8 @@ import com.Assignment.Multi_Vendor.Food.Delivery.dto.Users;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.Admin;
 import com.Assignment.Multi_Vendor.Food.Delivery.model.ROLE;
 import com.Assignment.Multi_Vendor.Food.Delivery.repository.AdminRepository;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.ApiResponseGenerator;
+import com.Assignment.Multi_Vendor.Food.Delivery.utility.MessageConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -34,7 +36,7 @@ public class AdminAuthController {
 
     // for creating the admin entity inside the database, to get proper salt value for the BCrypt encoder.
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<?>> addNewAdmin( @Valid @RequestBody LoginRequestDto requestDto) throws UserNameAlreadyTakenException {
+    public ResponseEntity<ApiResponse<String>> addNewAdmin( @Valid @RequestBody LoginRequestDto requestDto) throws UserNameAlreadyTakenException {
 
         Admin admin = modelMapper.map(requestDto, Admin.class);
         admin.setRole(ROLE.ADMIN);
@@ -44,14 +46,8 @@ public class AdminAuthController {
             throw new UserNameAlreadyTakenException();
         }
         adminRepository.save(admin);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new ApiResponse<>(
-                        HttpStatus.OK.value(),
-                        "Ur account has been created",
-                        "U have successfully registered here"
-                ));
+        return ApiResponseGenerator
+                .generateSuccessfulApiResponse(HttpStatus.OK, MessageConstants.CREATED, MessageConstants.CREATED);
 
     }
 
@@ -71,27 +67,17 @@ public class AdminAuthController {
                     .role(admin.getRole().toString())
                     .build();
 
-            return ResponseEntity
-                    .status(HttpStatus.ACCEPTED)
-                    .body(new ApiResponse<>(
-                            HttpStatus.ACCEPTED.value(),
-                            "u have successfully login",
-                            jwtUtility.generateAccessToken(users)
-                    ));
+            String token = jwtUtility.generateAccessToken(users);
+            return ApiResponseGenerator
+                    .generateSuccessfulApiResponse(HttpStatus.ACCEPTED, MessageConstants.LOGIN_SUCCESS, token );
 
 
         }catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid email or password");
+                    .body(MessageConstants.INVALID_CREDENTIALS);
         } catch (UsernameNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found");
-        } catch (DisabledException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Account is disabled");
-        } catch (LockedException ex) {
-            return ResponseEntity.status(HttpStatus.LOCKED)
-                    .body("Account is locked");
+                    .body(MessageConstants.USER_NOT_FOUND);
         }
     }
 }

@@ -15,8 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -84,5 +86,16 @@ class DeliveryAgentServiceImplementationTest {
                 .thenReturn(agents);
 
         assertIterableEquals(agents,agentService.getAllDeliveryAgents());
+    }
+
+    @Test
+    public void findByRestaurantNameAndStatus_test(){
+        when(deliveryAgentRepository.findByAvaibiltyBefore(any()))
+                .thenReturn(null);
+        assertNull(agentService.getAllDeliveryAgents(new Date()));
+
+        when(deliveryAgentRepository.findByAvaibiltyBefore(any()))
+                .thenReturn(agents);
+        assertIterableEquals(agents,agentService.getAllDeliveryAgents(new Date()));
     }
 }
