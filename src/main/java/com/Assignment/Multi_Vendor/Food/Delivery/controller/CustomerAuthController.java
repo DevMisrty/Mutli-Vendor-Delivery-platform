@@ -15,12 +15,17 @@ import jakarta.mail.Message;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/auth/customer")
@@ -34,8 +39,7 @@ public class CustomerAuthController {
     private final CustomerRepository customerRepository;
     private final JwtUtility jwtUtility;
     private final OTPAuthService oTPAuthService;
-    private Integer otp;
-    private String email;
+    private final RedisTemplate<String,String> redis;
 
     @PostMapping("/signin")
     public ResponseEntity<ApiResponse<CustomerDto>> addNewCustomer(@Valid @RequestBody CustomerDto customerDto)
@@ -66,8 +70,13 @@ public class CustomerAuthController {
                     .to(loginRequestDto.getEmail())
                     .build();
 
-            email= loginRequestDto.getEmail();
-            otp = FoodDeliveryPlatform.generateOtp();
+            String email= loginRequestDto.getEmail();
+            Integer otp = FoodDeliveryPlatform.generateOtp();
+
+            redis.opsForValue()
+                            .set("email",email,2,TimeUnit.MINUTES);
+            redis.opsForValue()
+                            .set("otp", String.valueOf(otp),2, TimeUnit.MINUTES);
 
             oTPAuthService.sendMail(emailDetails, otp);
             return ApiResponseGenerator
@@ -89,8 +98,14 @@ public class CustomerAuthController {
     public ResponseEntity<ApiResponse<String>> otpVerification(@Valid @RequestBody OtpRequestDto requestDto)
             throws IncorrectCredentialsException {
 
-        if(!requestDto.getOtp().equals(otp) || !email.equals(requestDto.getEmail())){
- 
+        String email = redis.opsForValue().get("email");
+        String otp = redis.opsForValue().get("otp");
+
+        if(otp==null){
+            throw new IncorrectCredentialsException(MessageConstants.OTP_EXPIRED);
+        }
+
+        if(!requestDto.getOtp().equals(Integer.parseInt(otp))    || !email.equals(requestDto.getEmail())){
             throw new IncorrectCredentialsException(MessageConstants.OTP_INVALID);
         }
 

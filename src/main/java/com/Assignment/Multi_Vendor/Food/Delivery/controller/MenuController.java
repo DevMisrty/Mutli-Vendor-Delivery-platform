@@ -23,7 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+/**
+ * REST controller for handling menu-related operations.
+ * Provides endpoints for retrieving menu items based on different criteria
+ * such as restaurant, cuisine type, and rating.
+ * */
+ @RestController
 @RequestMapping("/menu")
 @RequiredArgsConstructor
 public class MenuController {
@@ -32,6 +37,18 @@ public class MenuController {
     private final DishesService dishesService;
     private final ModelMapper modelMapper;
 
+    /**
+     * Retrieves the menu for a specific restaurant.
+     *
+     * @param restsName The name of the restaurant whose menu is to be retrieved
+     * @return ResponseEntity containing the list of dishes in the restaurant's menu
+     * @throws RestaurantNotFoundException if the specified restaurant is not found
+     *
+     * @apiNote This endpoint returns all dishes available at the specified restaurant.
+     *          The restaurant must be approved to appear in the results.
+     *
+     * @example GET /menu/rest/Dominos
+     */
     @GetMapping("/rest/{restsName}")
     public ResponseEntity<ApiResponse<List<Dishes>>> getMenuOfRestaurant(@PathVariable String restsName)
             throws RestaurantNotFoundException {
@@ -48,6 +65,18 @@ public class MenuController {
                 );
     }
 
+    /**
+     * Retrieves menu items filtered by cuisine type.
+     *
+     * @param cuisine The type of cuisine to filter by (e.g., ITALIAN, CHINESE)
+     * @return ResponseEntity containing the list of dishes matching the cuisine
+     * @throws NoSuchCuisineFound if the specified cuisine type is not recognized
+     *
+     * @apiNote This endpoint is case-insensitive for cuisine names.
+     *          It converts the input to uppercase to match the enum values.
+     *
+     * @example GET /menu/cuisine/italian
+     */
     @GetMapping("/cuisine/{cuisine}")
     public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnCuisine
             (@PathVariable String cuisine )
@@ -64,6 +93,18 @@ public class MenuController {
                 );
     }
 
+    /**
+     * Retrieves menu items with a rating greater than or equal to the specified value.
+     *
+     * @param star The minimum rating value (1.0 to 5.0)
+     * @return ResponseEntity containing the list of dishes meeting the rating criteria
+     * @throws IncorrectInputException if the rating is outside the valid range
+     *
+     * @apiNote The rating scale is from 1.0 to 5.0. The endpoint will return
+     *          all dishes with a rating greater than or equal to the specified value.
+     *
+     * @example GET /menu/rating/4.2 , GET /menu/rating/4
+     */
     @GetMapping("/rating/{star}")
     public ResponseEntity<ApiResponse<List<DishesResponseDto>>> getMenuBasedOnRating
             (@PathVariable Float star)

@@ -34,7 +34,19 @@ public class AdminAuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtility jwtUtility;
 
-    // for creating the admin entity inside the database, to get proper salt value for the BCrypt encoder.
+    /**
+     * Registers a new admin in the system.
+     *
+     * @param requestDto The DTO containing admin registration details
+     * @return ResponseEntity containing the registration status
+     * @throws UserNameAlreadyTakenException if an admin with the given email already exists
+     *
+     * @apiNote This endpoint is used to create a new admin account. The password will be
+     *          automatically encoded before storing in the database.
+     *
+     * @example POST /auth/admin/signin
+     *          Request Body: {"email": "admin@example.com", "password": "secure123"}
+     */
     @PostMapping("/signin")
     public ResponseEntity<ApiResponse<String>> addNewAdmin( @Valid @RequestBody LoginRequestDto requestDto) throws UserNameAlreadyTakenException {
 
@@ -51,6 +63,21 @@ public class AdminAuthController {
 
     }
 
+    /**
+     * Authenticates an admin and returns a JWT token upon successful authentication.
+     *
+     * @param loginRequestDto The DTO containing login credentials
+     * @return ResponseEntity containing the JWT token if authentication is successful
+     *
+     * @throws UsernameNotFoundException if the admin with the given email is not found
+     * @throws BadCredentialsException if the provided credentials are invalid
+     *
+     * @apiNote This endpoint validates the admin's credentials and returns a JWT token
+     *          that can be used for subsequent authenticated requests.
+     *
+     * @example POST /auth/admin/login
+     *          Request Body: {"email": "admin@example.com", "password": "secure123"}
+     */
     @PostMapping("/login")
     public ResponseEntity<?> authenticateAdmin( @Valid  @RequestBody LoginRequestDto loginRequestDto) {
         try{
